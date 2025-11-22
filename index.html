@@ -1,313 +1,249 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>相模原ダルク｜理念・ミッション</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
     :root {
-      --sd-navy: #10395A;
-      --sd-blue: #1D66A5;
-      --sd-light-blue: #F3F7FB;
-      --sd-border: #D6DFEA;
-      --sd-text-main: #243240;
-      --sd-text-muted: #707989;
-      --sd-white: #FFFFFF;
-      --sd-radius-lg: 18px;
-      --sd-shadow-soft: 0 10px 30px rgba(16, 57, 90, 0.08);
-      --sd-max-width: 1040px;
+      --sd-navy: #002b6c;
+      --sd-blue: #0045a5;
+      --sd-border: #d8e0f2;
+      --sd-bg-soft: #f7f9ff;
+      --sd-text-main: #333333;
+      --sd-text-muted: #666666;
+      --sd-max-width: 1100px;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
-                   "Segoe UI", "Yu Gothic", "YuGothic", "Hiragino Sans",
-                   "メイリオ", sans-serif;
+      font-family: "Yu Gothic", "游ゴシック体",
+                   "Hiragino Kaku Gothic ProN", "Meiryo",
+                   -apple-system, BlinkMacSystemFont, sans-serif;
       color: var(--sd-text-main);
-      background: #F8FAFD;
+      background-color: #ffffff;
       line-height: 1.8;
       font-size: 16px;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
 
-    .wrapper { min-height: 100vh; }
-
-    /* ヘッダー帯（簡易版） */
-    .ph-hero {
-      background: #00358C;
-      padding: 14px 16px;
-      color: #ffffff;
+    .page-wrapper {
+      padding: 40px 0 60px;
     }
 
-    .ph-hero-inner {
+    .page-inner {
       max-width: var(--sd-max-width);
       margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding: 0 20px;
     }
 
-    .ph-logo {
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      white-space: nowrap;
+    /* 見出し */
+    .page-heading {
+      margin-bottom: 28px;
+      border-top: 3px solid var(--sd-blue);
+      padding-top: 18px;
     }
 
-    .ph-nav-right {
+    .page-heading__eyebrow {
       font-size: 12px;
-      opacity: 0.9;
-      white-space: nowrap;
+      letter-spacing: 0.25em;
+      color: var(--sd-blue);
+      margin: 0 0 6px;
     }
 
-    /* FACILITY帯 */
-    .ph-band {
-      background: #0050A0;
-      color: #ffffff;
-      padding: 14px 16px;
-    }
-
-    .ph-band-inner {
-      max-width: var(--sd-max-width);
-      margin: 0 auto;
-      font-size: 13px;
-    }
-
-    .ph-band-label {
-      font-size: 11px;
-      letter-spacing: 0.2em;
-    }
-
-    .ph-band-title {
-      margin-top: 4px;
-      font-weight: 500;
-    }
-
-    /* 理念タイトル＋本文 */
-    .ph-body {
-      padding: 28px 16px 48px;
-    }
-
-    .ph-body-inner {
-      max-width: var(--sd-max-width);
-      margin: 0 auto;
-    }
-
-    .ph-title-wrap {
-      text-align: left;
-      margin-bottom: 12px;
-    }
-
-    .ph-title-main {
+    .page-heading__title {
       margin: 0;
       font-size: 24px;
-      line-height: 1.6;
+      line-height: 1.5;
       color: var(--sd-navy);
       font-weight: 600;
     }
 
-    .ph-title-sub {
-      margin: 6px 0 0;
+    /* 理念本体・サブ理念 */
+    .rinen-block {
+      margin-bottom: 32px;
+    }
+
+    .rinen-block__title {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: var(--sd-navy);
+      font-weight: 600;
+    }
+
+    .rinen-core {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .rinen-sub {
+      margin: 0;
       font-size: 14px;
-      color: var(--sd-text-muted);
+      color: var(--sd-text-main);
+      line-height: 1.9;
     }
 
-    .ph-textbox {
-      margin-top: 10px;
-      background: #FFFFFF;
-      border-radius: 16px;
-      border: 1px solid #E1E8F2;
-      box-shadow: var(--sd-shadow-soft);
-      padding: 22px 20px;
+    /* 理念説明文 */
+    .rinen-textbox {
+      background: var(--sd-bg-soft);
+      border: 1px solid var(--sd-border);
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin-bottom: 32px;
     }
 
-    .ph-textbox p {
+    .rinen-textbox p {
       margin: 0 0 12px;
       font-size: 14px;
       line-height: 1.9;
-      text-align: justify;
     }
 
-    .ph-textbox p:last-child { margin-bottom: 0; }
+    .rinen-textbox p:last-child {
+      margin-bottom: 0;
+    }
 
-    /* 3つのミッション */
+    /* ミッション */
     .missions {
-      padding: 0 16px 56px;
-      background: var(--sd-light-blue);
-      border-top: 1px solid #E1E8F2;
+      margin-top: 8px;
     }
 
-    .missions-inner {
-      max-width: var(--sd-max-width);
-      margin: 0 auto;
-    }
-
-    .missions-title {
-      margin: 24px 0 6px;
-      font-size: 20px;
+    .missions__title {
+      margin: 0 0 8px;
+      font-size: 18px;
       color: var(--sd-navy);
-      text-align: center;
       font-weight: 600;
-    }
-
-    .missions-lead {
-      margin: 0 0 24px;
-      text-align: center;
-      font-size: 13px;
-      color: var(--sd-text-muted);
-    }
-
-    .missions-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
     }
 
     .mission-card {
-      background: #FFFFFF;
-      border-radius: 14px;
-      border: 1px solid #D5DDE9;
-      box-shadow: 0 10px 24px rgba(0, 20, 80, 0.05);
+      background: #ffffff;
+      border-radius: 6px;
+      border: 1px solid var(--sd-border);
       padding: 18px 16px 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      margin-bottom: 16px;
     }
 
-    .mission-en {
-      margin: 0 0 6px;
-      font-size: 12px;
-      letter-spacing: 0.18em;
+    .mission-card__en {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: #4b6fb5;
+      margin: 0 0 4px;
       text-transform: uppercase;
-      color: #0050A0;
     }
 
-    .mission-ja {
-      margin: 0 0 6px;
+    .mission-card__ja {
+      margin: 0 0 8px;
       font-size: 15px;
       font-weight: 600;
-      color: #00235F;
+      color: var(--sd-navy);
     }
 
-    .mission-text {
+    .mission-card__text {
       margin: 0;
       font-size: 13px;
       line-height: 1.8;
-      color: #333333;
     }
 
-    .mission-card--dignity {
-      border-top: 3px solid #1F4C7F;
-    }
-    .mission-card--honesty {
-      border-top: 3px solid #1D66A5;
-    }
-    .mission-card--community {
-      border-top: 3px solid #1E8B87;
-    }
+    .mission-card--principal { border-top: 3px solid #333366; }
+    .mission-card--dignity   { border-top: 3px solid #1f4c7f; }
+    .mission-card--honesty   { border-top: 3px solid #1d66a5; }
+    .mission-card--community { border-top: 3px solid #1e8b87; }
 
-    /* スマホ調整 */
-    @media (max-width: 767px) {
-      body { font-size: 15px; }
-      .ph-title-main { font-size: 20px; }
-      .ph-textbox { padding: 18px 14px; }
-      .missions-grid { grid-template-columns: 1fr; }
-      .mission-card { padding: 16px 14px 14px; }
+    /* レスポンシブ */
+    @media screen and (max-width: 960px) {
+      .page-wrapper { padding: 28px 0 40px; }
+      .page-inner { padding: 0 16px; }
+      .page-heading__title { font-size: 20px; }
+      .rinen-block__title { font-size: 16px; }
     }
   </style>
 </head>
 <body>
-<div class="wrapper">
+  <div class="page-wrapper">
+    <div class="page-inner">
 
-  <!-- 簡易ヘッダー -->
-  <header class="ph-hero">
-    <div class="ph-hero-inner">
-      <div class="ph-logo">SAGAMIHARA DARC</div>
-      <div class="ph-nav-right">TEL / MENU</div>
-    </div>
-  </header>
+      <header class="page-heading">
+        <p class="page-heading__eyebrow">／ PHILOSOPHY ／</p>
+        <h1 class="page-heading__title">相模原ダルクの理念とミッション</h1>
+      </header>
 
-  <!-- FACILITY帯 -->
-  <div class="ph-band">
-    <div class="ph-band-inner">
-      <div class="ph-band-label">／ FACILITY ／</div>
-      <div class="ph-band-title">相模原ダルクの理念について</div>
-    </div>
-  </div>
-
-  <!-- 理念本文 -->
-  <main class="ph-body">
-    <div class="ph-body-inner">
-
-      <div class="ph-title-wrap">
-        <h1 class="ph-title-main">人としての尊厳を守り、ともに生き直す</h1>
-        <p class="ph-title-sub">― 相模原ダルクの理念と約束 ―</p>
-      </div>
-
-      <div class="ph-textbox">
-        <p>
-          相模原ダルクの理念は、一人ひとりが尊厳ある存在として大切に扱われ、恐れや圧力ではなく信頼と対話を基盤に生き直す力が発揮される環境を守ることにある。
+      <!-- 理念・サブ理念 -->
+      <section class="rinen-block">
+        <h2 class="rinen-block__title">理念</h2>
+        <p class="rinen-core">
+          人としての尊厳を揺るぎない基本原理とし、生き直す力を確かなプロセスとして支える。
         </p>
-        <p>
-          互いを「人」として尊重し、誠実さと自由さを育てる共同体を中心に据え、安心して自分を表現できる関係性と、学び合いが自然に生まれる空気を大切にしている。
-        </p>
-        <p>
-          同時に、人権を損なう行為を一切認めない姿勢を明確に掲げている。暴力、暴言、心理的虐待、差別的言動、不当な扱い、ハラスメント全般、さらには利用者・家族・外部からスタッフに向けられるカスタマーハラスメントも含め、尊厳を脅かすあらゆる行為を排し、関わるすべての人を守ることを根本原理としている。
-        </p>
-        <p>
-          相談しやすい環境と、公正で透明性のある対応体制は、安全と尊厳を守るための不可欠な基盤であり、静かに生き直しの力を取り戻すための条件となる。
-        </p>
-        <p>
-          理念の中心にあるのは、行動の是非ではなく、その人の存在そのものが尊重される状態こそが変容の出発点であるという考え方である。そこに立脚することで、価値観や関係性が整い、「ここから再び歩める」という内的な確かさが芽生えていく。
-        </p>
-        <p>
-          この理念が、相模原ダルクを支える最も根源的な軸であり、後に示されるミッションを形づくる根本となる。
-        </p>
-      </div>
 
-    </div>
-  </main>
+        <h2 class="rinen-block__title">サブ理念</h2>
+        <p class="rinen-sub">
+          個々を尊重する関係性を基盤に、安心・対話・公正を制度的かつ倫理的に保障し、人が内に備える変化と回復の過程を確かに支える。
+        </p>
+      </section>
 
-  <!-- 3つのミッション -->
-  <section class="missions">
-    <div class="missions-inner">
+      <!-- 理念説明文 -->
+      <section class="rinen-block">
+        <h2 class="rinen-block__title">理念の背景・考え方</h2>
+        <div class="rinen-textbox">
+          <p>
+            相模原ダルクは、「人としての尊厳」を揺るぎない基本原理として位置づけ、誰もが恐れや圧力ではなく、信頼と対話に支えられた環境の中で生き直しに向き合える場を創り出すことを使命としています。
+          </p>
+          <p>
+            私たちは、個々を尊重する関係性を基盤に、安心・対話・公正を制度的かつ倫理的に保障することで、利用者・家族・スタッフが安全に自分を開ける共同体づくりを大切にしています。
+          </p>
+          <p>
+            同時に、暴力・暴言・心理的虐待・差別的言動・不当な扱い・ハラスメント全般、さらには利用者・家族・外部からスタッフに向けられるカスタマーハラスメントも含め、尊厳を脅かすあらゆる行為を一切認めません。これらを排することは、回復・支援の場を守る根本原理であり、全ての人の尊厳を守るための最低限の基盤です。
+          </p>
+          <p>
+            また、人は本来、内に「変化と回復の可能性」を持っています。その力が損なわれずに発揮されるためには、安心できる環境、公正で誠実な関わり、対話の継続、そして尊厳を守られた関係性が必要不可欠です。相模原ダルクは、その過程を確かに支えるために、透明性・説明責任・倫理性を重視した運営を行います。
+          </p>
+          <p>
+            私たちの理念は、単に依存症を「やめる」ことだけを目的とするのではなく、個々が本来有する力を取り戻し、「ここから再び歩める」という確かな実感を育てるための土台となるものです。この理念こそが、相模原ダルクを支える中心的な価値であり、下記のミッションを方向づける根源となります。
+          </p>
+        </div>
+      </section>
 
-      <h2 class="missions-title">3つのミッション</h2>
-      <p class="missions-lead">
-        この理念を具体的なかたちとして支えるために、相模原ダルクは次の3つのミッションを軸としている。
-      </p>
+      <!-- ミッション -->
+      <section class="missions">
+        <h2 class="missions__title">4つのミッション（PRINCIPAL＋3本柱）</h2>
 
-      <div class="missions-grid">
+        <article class="mission-card mission-card--principal">
+          <p class="mission-card__en">PRINCIPAL</p>
+          <h3 class="mission-card__ja">中心原則</h3>
+          <p class="mission-card__text">
+            尊厳・誠実・公正を中核原理とし、支援・判断・関係性のすべてが理念に一貫して基づくよう、倫理的責務と専門性をもって回復の実践を導く。
+          </p>
+        </article>
 
         <article class="mission-card mission-card--dignity">
-          <p class="mission-en">DIGNITY</p>
-          <h3 class="mission-ja">尊厳と人権を守る場</h3>
-          <p class="mission-text">
-            一人ひとりの尊厳を損なう行為を排し、暴力・差別・ハラスメントからスタッフと利用者、その家族を守る。
+          <p class="mission-card__en">DIGNITY</p>
+          <h3 class="mission-card__ja">尊厳</h3>
+          <p class="mission-card__text">
+            すべての人の尊厳と人権を守り、安全と公正を確保する。暴力・差別・ハラスメント・不当な扱いを一切排し、人として扱われるための最低限の安全基盤を制度・倫理両面で守り抜く。
           </p>
         </article>
 
         <article class="mission-card mission-card--honesty">
-          <p class="mission-en">HONESTY</p>
-          <h3 class="mission-ja">誠実さと対話を軸に</h3>
-          <p class="mission-text">
-            恐れや圧力ではなく、信頼と対話を基盤に向き合い、その人の存在そのものを尊重する誠実な関係を保つ。
+          <p class="mission-card__en">HONESTY</p>
+          <h3 class="mission-card__ja">誠実</h3>
+          <p class="mission-card__text">
+            誠実な関わりと対話を中心に、信頼に基づく支援関係を築く。事実に向き合い、弱さも含めて率直であることを重んじ、変化と回復の過程を支えるための確かな関係性を形づくる。
           </p>
         </article>
 
         <article class="mission-card mission-card--community">
-          <p class="mission-en">COMMUNITY</p>
-          <h3 class="mission-ja">安心と公正の共同体</h3>
-          <p class="mission-text">
-            相談しやすく、公正で透明性のある仕組みによって、安全と安心が守られた「ともに生き直す共同体」として機能する。
+          <p class="mission-card__en">COMMUNITY</p>
+          <h3 class="mission-card__ja">共同体</h3>
+          <p class="mission-card__text">
+            安心・公正・開かれた共同体として、変化と回復の可能性を支える。個々を尊重し合い、対話を重ね、外部機関とも連携しながら、回復が継続的に進む環境を守る。
           </p>
         </article>
+      </section>
 
-      </div>
     </div>
-  </section>
-
-</div>
+  </div>
 </body>
 </html>

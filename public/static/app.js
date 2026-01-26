@@ -930,20 +930,853 @@ function collectFormData() {
 }
 
 // ==========================================
-// 他のページ表示関数（プレースホルダー）
+// 相談履歴ページ
 // ==========================================
 
-function showHistoryPage() {
-  alert('相談履歴ページ - 開発中');
-  // TODO: 実装予定
+async function showHistoryPage() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="min-h-screen bg-gray-50">
+      <!-- ヘッダー -->
+      <header class="bg-gradient-to-r from-green-600 to-green-800 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <button onclick="showHomePage()" class="hover:bg-green-700 p-2 rounded">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <h1 class="text-2xl font-bold">相談履歴</h1>
+            </div>
+            <button onclick="exportToCSV()" class="bg-white text-green-700 px-4 py-2 rounded-lg hover:bg-green-50 font-semibold">
+              <i class="fas fa-download mr-2"></i>CSV出力
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="container mx-auto px-4 py-6">
+        <!-- 検索フォーム -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-search mr-2 text-green-600"></i>
+            検索条件
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">キーワード</label>
+              <input type="text" id="search_keyword" placeholder="名前、相談内容など"
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">緊急度</label>
+              <select id="search_emergency" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500">
+                <option value="">すべて</option>
+                <option value="高">高</option>
+                <option value="中">中</option>
+                <option value="低">低</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">開始日</label>
+              <input type="date" id="search_date_from"
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">終了日</label>
+              <input type="date" id="search_date_to"
+                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500">
+            </div>
+          </div>
+          <div class="mt-4 flex space-x-2">
+            <button onclick="performSearch()" 
+                    class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold">
+              <i class="fas fa-search mr-2"></i>検索
+            </button>
+            <button onclick="clearSearch()" 
+                    class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold">
+              <i class="fas fa-redo mr-2"></i>クリア
+            </button>
+          </div>
+        </div>
+
+        <!-- 相談履歴リスト -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-bold text-gray-800 mb-4">相談記録一覧</h2>
+          <div id="history-list" class="space-y-4">
+            <div class="text-center py-8">
+              <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
+              <p class="mt-4 text-gray-600">データを読み込み中...</p>
+            </div>
+          </div>
+          
+          <!-- ページネーション -->
+          <div id="pagination" class="mt-6"></div>
+        </div>
+      </main>
+    </div>
+  `;
+
+  // データを読み込み
+  await loadHistoryData();
 }
 
-function showStatsPage() {
-  alert('統計情報ページ - 開発中');
-  // TODO: 実装予定
+async function loadHistoryData(page = 1) {
+  const data = await loadConsultations(page, 20);
+  const container = document.getElementById('history-list');
+  const paginationContainer = document.getElementById('pagination');
+
+  if (!data || !data.consultations || data.consultations.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-8">
+        <i class="fas fa-inbox text-6xl text-gray-300"></i>
+        <p class="mt-4 text-gray-600">相談記録がありません</p>
+      </div>
+    `;
+    return;
+  }
+
+  // 相談リストを表示
+  container.innerHTML = data.consultations.map(consultation => {
+    const emergencyColor = {
+      '高': 'bg-red-100 text-red-800',
+      '中': 'bg-yellow-100 text-yellow-800',
+      '低': 'bg-green-100 text-green-800'
+    }[consultation.emergency_level] || 'bg-gray-100 text-gray-800';
+
+    const addictionTypes = consultation.addiction_types 
+      ? JSON.parse(consultation.addiction_types).slice(0, 3).join(', ')
+      : '未記入';
+
+    return `
+      <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+           onclick="showConsultationDetail(${consultation.id})">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="flex items-center space-x-3 mb-2">
+              <h3 class="text-lg font-bold text-gray-800">
+                ${consultation.caller_name || '匿名'}
+              </h3>
+              <span class="px-3 py-1 text-xs font-semibold rounded-full ${emergencyColor}">
+                緊急度: ${consultation.emergency_level}
+              </span>
+              ${consultation.caller_age ? `<span class="text-sm text-gray-600">${consultation.caller_age}歳</span>` : ''}
+              ${consultation.caller_gender ? `<span class="text-sm text-gray-600">${consultation.caller_gender}</span>` : ''}
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-2">
+              <div><i class="fas fa-calendar mr-1 text-green-600"></i>${formatDateTime(consultation.reception_datetime)}</div>
+              <div><i class="fas fa-user mr-1 text-green-600"></i>対応者: ${consultation.staff_name}</div>
+              <div><i class="fas fa-heartbeat mr-1 text-green-600"></i>${addictionTypes}</div>
+              <div><i class="fas fa-phone mr-1 text-green-600"></i>${consultation.caller_relationship || '未記入'}</div>
+            </div>
+            ${consultation.consultation_content ? `
+              <p class="text-sm text-gray-700 line-clamp-2">
+                ${consultation.consultation_content.substring(0, 100)}${consultation.consultation_content.length > 100 ? '...' : ''}
+              </p>
+            ` : ''}
+          </div>
+          <div class="ml-4">
+            <button onclick="event.stopPropagation(); exportToPDF(${consultation.id})" 
+                    class="text-blue-600 hover:text-blue-800 p-2" title="PDF出力">
+              <i class="fas fa-file-pdf text-xl"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // ページネーション
+  if (data.pagination.totalPages > 1) {
+    paginationContainer.innerHTML = `
+      <div class="flex items-center justify-center space-x-2">
+        ${data.pagination.page > 1 ? `
+          <button onclick="loadHistoryData(${data.pagination.page - 1})" 
+                  class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+        ` : ''}
+        <span class="text-gray-700 font-medium">
+          ${data.pagination.page} / ${data.pagination.totalPages} ページ
+          （全 ${data.pagination.total} 件）
+        </span>
+        ${data.pagination.page < data.pagination.totalPages ? `
+          <button onclick="loadHistoryData(${data.pagination.page + 1})" 
+                  class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        ` : ''}
+      </div>
+    `;
+  }
 }
 
-function showManualPage() {
-  alert('対応マニュアルページ - 開発中');
-  // TODO: 実装予定
+async function performSearch() {
+  const keyword = document.getElementById('search_keyword').value;
+  const emergency = document.getElementById('search_emergency').value;
+  const dateFrom = document.getElementById('search_date_from').value;
+  const dateTo = document.getElementById('search_date_to').value;
+
+  const params = {};
+  if (keyword) params.keyword = keyword;
+  if (emergency) params.emergency_level = emergency;
+  if (dateFrom) params.date_from = dateFrom;
+  if (dateTo) params.date_to = dateTo;
+
+  const results = await searchConsultations(params);
+  const container = document.getElementById('history-list');
+  const paginationContainer = document.getElementById('pagination');
+
+  if (!results || results.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-8">
+        <i class="fas fa-search text-6xl text-gray-300"></i>
+        <p class="mt-4 text-gray-600">検索結果が見つかりませんでした</p>
+      </div>
+    `;
+    paginationContainer.innerHTML = '';
+    return;
+  }
+
+  // 検索結果を表示（同じフォーマット）
+  container.innerHTML = results.map(consultation => {
+    const emergencyColor = {
+      '高': 'bg-red-100 text-red-800',
+      '中': 'bg-yellow-100 text-yellow-800',
+      '低': 'bg-green-100 text-green-800'
+    }[consultation.emergency_level] || 'bg-gray-100 text-gray-800';
+
+    const addictionTypes = consultation.addiction_types 
+      ? JSON.parse(consultation.addiction_types).slice(0, 3).join(', ')
+      : '未記入';
+
+    return `
+      <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+           onclick="showConsultationDetail(${consultation.id})">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="flex items-center space-x-3 mb-2">
+              <h3 class="text-lg font-bold text-gray-800">
+                ${consultation.caller_name || '匿名'}
+              </h3>
+              <span class="px-3 py-1 text-xs font-semibold rounded-full ${emergencyColor}">
+                緊急度: ${consultation.emergency_level}
+              </span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-sm text-gray-600 mb-2">
+              <div><i class="fas fa-calendar mr-1 text-green-600"></i>${formatDateTime(consultation.reception_datetime)}</div>
+              <div><i class="fas fa-user mr-1 text-green-600"></i>対応者: ${consultation.staff_name}</div>
+              <div><i class="fas fa-heartbeat mr-1 text-green-600"></i>${addictionTypes}</div>
+            </div>
+          </div>
+          <div class="ml-4">
+            <button onclick="event.stopPropagation(); exportToPDF(${consultation.id})" 
+                    class="text-blue-600 hover:text-blue-800 p-2" title="PDF出力">
+              <i class="fas fa-file-pdf text-xl"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  paginationContainer.innerHTML = `
+    <div class="text-center text-gray-600">
+      ${results.length} 件の検索結果
+    </div>
+  `;
+}
+
+function clearSearch() {
+  document.getElementById('search_keyword').value = '';
+  document.getElementById('search_emergency').value = '';
+  document.getElementById('search_date_from').value = '';
+  document.getElementById('search_date_to').value = '';
+  loadHistoryData(1);
+}
+
+async function showConsultationDetail(id) {
+  try {
+    const response = await axios.get(`${API_BASE}/consultations/${id}`);
+    const consultation = response.data.consultation;
+
+    const addictionTypes = consultation.addiction_types 
+      ? JSON.parse(consultation.addiction_types).join(', ')
+      : '未記入';
+    
+    const coordination = consultation.coordination_needed
+      ? JSON.parse(consultation.coordination_needed).join(', ')
+      : '未記入';
+
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen bg-gray-50">
+        <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+          <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <button onclick="showHistoryPage()" class="hover:bg-blue-700 p-2 rounded">
+                  <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h1 class="text-2xl font-bold">相談記録詳細</h1>
+              </div>
+              <button onclick="exportToPDF(${id})" class="bg-white text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-50 font-semibold">
+                <i class="fas fa-file-pdf mr-2"></i>PDF出力
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <main class="container mx-auto px-4 py-6 max-w-4xl">
+          <div class="space-y-6">
+            <!-- 基本情報 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">基本情報</h2>
+              <div class="grid grid-cols-2 gap-4">
+                <div><span class="font-medium">受付日時:</span> ${formatDateTime(consultation.reception_datetime)}</div>
+                <div><span class="font-medium">対応者:</span> ${consultation.staff_name}</div>
+                <div><span class="font-medium">お名前:</span> ${consultation.caller_name || '匿名'}</div>
+                <div><span class="font-medium">年齢:</span> ${consultation.caller_age ? consultation.caller_age + '歳' : '未記入'}</div>
+                <div><span class="font-medium">性別:</span> ${consultation.caller_gender || '未記入'}</div>
+                <div><span class="font-medium">電話番号:</span> ${consultation.caller_phone || '未記入'}</div>
+                <div><span class="font-medium">相談者:</span> ${consultation.caller_relationship || '未記入'}</div>
+                ${consultation.caller_relationship_detail ? `<div><span class="font-medium">詳細:</span> ${consultation.caller_relationship_detail}</div>` : ''}
+              </div>
+            </div>
+
+            <!-- 依存症情報 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">依存症情報</h2>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-2"><span class="font-medium">種類:</span> ${addictionTypes}</div>
+                <div><span class="font-medium">期間:</span> ${consultation.addiction_period || '未記入'}</div>
+                <div><span class="font-medium">頻度:</span> ${consultation.addiction_frequency || '未記入'}</div>
+                <div><span class="font-medium">重症度:</span> ${consultation.addiction_severity || '未記入'}</div>
+              </div>
+            </div>
+
+            <!-- 緊急度評価 -->
+            <div class="bg-white rounded-lg shadow-md p-6 border-2 ${consultation.emergency_level === '高' ? 'border-red-300' : consultation.emergency_level === '中' ? 'border-yellow-300' : 'border-green-300'}">
+              <h2 class="text-xl font-bold mb-4 border-b pb-2 ${consultation.emergency_level === '高' ? 'text-red-600' : consultation.emergency_level === '中' ? 'text-yellow-600' : 'text-green-600'}">
+                緊急度評価: ${consultation.emergency_level}
+              </h2>
+              <div class="space-y-2">
+                ${consultation.emergency_use_24h ? '<div class="text-red-600">✓ 24時間以内の使用がある</div>' : ''}
+                ${consultation.emergency_withdrawal ? '<div class="text-red-600">✓ 離脱症状がある</div>' : ''}
+                ${consultation.emergency_self_harm ? '<div class="text-red-600">✓ 自傷・他害の恐れがある</div>' : ''}
+                ${consultation.emergency_medical_needed ? '<div class="text-red-600">✓ 医療機関への受診が必要</div>' : ''}
+              </div>
+            </div>
+
+            <!-- 相談内容 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">相談内容</h2>
+              <p class="text-gray-700 whitespace-pre-wrap">${consultation.consultation_content || '未記入'}</p>
+              ${consultation.notes ? `
+                <div class="mt-4 pt-4 border-t">
+                  <h3 class="font-medium text-gray-800 mb-2">特記事項</h3>
+                  <p class="text-gray-700 whitespace-pre-wrap">${consultation.notes}</p>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- 次のアクション -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">次のアクション</h2>
+              <div class="space-y-2">
+                ${consultation.interview_scheduled ? `<div>✓ 面談予約: ${formatDateTime(consultation.interview_datetime)}</div>` : ''}
+                ${consultation.followup_scheduled ? `<div>✓ フォローアップ: ${formatDateTime(consultation.followup_datetime)}</div>` : ''}
+                <div><span class="font-medium">連携先:</span> ${coordination}</div>
+                ${consultation.report_completed ? `<div>✓ 報告済み (${consultation.report_to || ''})</div>` : ''}
+              </div>
+            </div>
+
+            <div class="flex space-x-4">
+              <button onclick="showHistoryPage()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg">
+                <i class="fas fa-arrow-left mr-2"></i>一覧に戻る
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+    `;
+  } catch (error) {
+    console.error('詳細取得エラー:', error);
+    showError('相談記録の取得に失敗しました');
+  }
+}
+
+// ==========================================
+// 統計ダッシュボードページ
+// ==========================================
+
+async function showStatsPage() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="min-h-screen bg-gray-50">
+      <header class="bg-gradient-to-r from-purple-600 to-purple-800 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <button onclick="showHomePage()" class="hover:bg-purple-700 p-2 rounded">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <h1 class="text-2xl font-bold">統計情報</h1>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="container mx-auto px-4 py-6">
+        <!-- 概要統計 -->
+        <div id="stats-overview" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+          <div class="text-center py-8">
+            <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
+          </div>
+        </div>
+
+        <!-- グラフエリア -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- 緊急度別グラフ -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">緊急度別相談件数</h2>
+            <canvas id="emergencyChart"></canvas>
+          </div>
+
+          <!-- 依存症種類別グラフ -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">依存症種類別統計（上位5件）</h2>
+            <canvas id="addictionChart"></canvas>
+          </div>
+
+          <!-- 最近の相談 -->
+          <div class="bg-white rounded-lg shadow-md p-6 lg:col-span-2">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">最近の相談（5件）</h2>
+            <div id="recent-consultations">
+              <div class="text-center py-4">
+                <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  `;
+
+  // 統計データを読み込んでグラフ表示
+  await loadAndDisplayStats();
+}
+
+async function loadAndDisplayStats() {
+  const stats = await loadStats();
+  
+  if (!stats) {
+    document.getElementById('stats-overview').innerHTML = `
+      <div class="col-span-4 text-center py-8 text-gray-600">
+        統計情報の取得に失敗しました
+      </div>
+    `;
+    return;
+  }
+
+  // 概要統計を表示
+  document.getElementById('stats-overview').innerHTML = `
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+      <div class="text-4xl font-bold text-blue-600">${stats.totalConsultations}</div>
+      <div class="text-sm text-gray-600 mt-2">総相談件数</div>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+      <div class="text-4xl font-bold text-green-600">${stats.thisMonthConsultations}</div>
+      <div class="text-sm text-gray-600 mt-2">今月の相談</div>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+      <div class="text-4xl font-bold text-red-600">${getEmergencyCount(stats.emergencyStats, '高')}</div>
+      <div class="text-sm text-gray-600 mt-2">緊急度：高</div>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+      <div class="text-4xl font-bold text-yellow-600">${getEmergencyCount(stats.emergencyStats, '中')}</div>
+      <div class="text-sm text-gray-600 mt-2">緊急度：中</div>
+    </div>
+  `;
+
+  // 緊急度別グラフ（ドーナツチャート）
+  const emergencyCtx = document.getElementById('emergencyChart').getContext('2d');
+  new Chart(emergencyCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['高', '中', '低'],
+      datasets: [{
+        data: [
+          getEmergencyCount(stats.emergencyStats, '高'),
+          getEmergencyCount(stats.emergencyStats, '中'),
+          getEmergencyCount(stats.emergencyStats, '低')
+        ],
+        backgroundColor: ['#dc2626', '#f59e0b', '#10b981'],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+
+  // 依存症種類別グラフ（横棒グラフ）
+  if (stats.addictionStats && stats.addictionStats.length > 0) {
+    const addictionCtx = document.getElementById('addictionChart').getContext('2d');
+    const labels = stats.addictionStats.map(item => {
+      try {
+        const types = JSON.parse(item.addiction_types);
+        return types.slice(0, 2).join(', ');
+      } catch {
+        return item.addiction_types || '不明';
+      }
+    });
+    const data = stats.addictionStats.map(item => item.count);
+
+    new Chart(addictionCtx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: '件数',
+          data: data,
+          backgroundColor: '#8b5cf6',
+          borderColor: '#7c3aed',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // 最近の相談を表示
+  if (stats.recentConsultations && stats.recentConsultations.length > 0) {
+    document.getElementById('recent-consultations').innerHTML = `
+      <div class="space-y-2">
+        ${stats.recentConsultations.map(c => {
+          const emergencyColor = {
+            '高': 'text-red-600',
+            '中': 'text-yellow-600',
+            '低': 'text-green-600'
+          }[c.emergency_level] || 'text-gray-600';
+          
+          return `
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer"
+                 onclick="showConsultationDetail(${c.id})">
+              <div class="flex items-center space-x-4">
+                <div class="text-sm">
+                  <div class="font-medium">${c.caller_name || '匿名'}</div>
+                  <div class="text-gray-600">${formatDateTime(c.reception_datetime)}</div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3">
+                <span class="${emergencyColor} font-semibold">緊急度: ${c.emergency_level}</span>
+                <span class="text-gray-600">${c.staff_name}</span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+}
+
+// ==========================================
+// 対応マニュアルページ
+// ==========================================
+
+async function showManualPage() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="min-h-screen bg-gray-50">
+      <header class="bg-gradient-to-r from-orange-600 to-orange-800 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <button onclick="showHomePage()" class="hover:bg-orange-700 p-2 rounded">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <h1 class="text-2xl font-bold">対応マニュアル</h1>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="container mx-auto px-4 py-6 max-w-6xl">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- 第1段階: オープニング -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-blue-600 mb-4 flex items-center">
+              <i class="fas fa-door-open mr-2"></i>
+              第1段階: オープニング（0-30秒）
+            </h2>
+            <div id="manual-opening" class="space-y-3">
+              読み込み中...
+            </div>
+          </div>
+
+          <!-- 第2段階: 傾聴・共感 -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-green-600 mb-4 flex items-center">
+              <i class="fas fa-ear-listen mr-2"></i>
+              第2段階: 傾聴・共感（30秒-5分）
+            </h2>
+            <div id="manual-listening" class="space-y-3">
+              読み込み中...
+            </div>
+          </div>
+
+          <!-- 第3段階: 情報提供 -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-purple-600 mb-4 flex items-center">
+              <i class="fas fa-info-circle mr-2"></i>
+              第3段階: 情報提供（5-10分）
+            </h2>
+            <div id="manual-information" class="space-y-3">
+              読み込み中...
+            </div>
+          </div>
+
+          <!-- 第4段階: クロージング -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-orange-600 mb-4 flex items-center">
+              <i class="fas fa-handshake mr-2"></i>
+              第4段階: クロージング
+            </h2>
+            <div id="manual-closing" class="space-y-3">
+              読み込み中...
+            </div>
+          </div>
+
+          <!-- 緊急対応 -->
+          <div class="bg-white rounded-lg shadow-md p-6 lg:col-span-2 border-2 border-red-300">
+            <h2 class="text-xl font-bold text-red-600 mb-4 flex items-center">
+              <i class="fas fa-exclamation-triangle mr-2"></i>
+              緊急対応フロー
+            </h2>
+            <div id="manual-emergency" class="space-y-3">
+              読み込み中...
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  `;
+
+  // フレーズを読み込んで表示
+  await loadAndDisplayManual();
+}
+
+async function loadAndDisplayManual() {
+  const phrases = await loadPhrases();
+
+  // 各カテゴリーのフレーズを表示
+  displayManualCategory('manual-opening', phrases.opening);
+  displayManualCategory('manual-listening', phrases.listening);
+  displayManualCategory('manual-information', phrases.information);
+  displayManualCategory('manual-closing', phrases.closing);
+  displayManualCategory('manual-emergency', phrases.emergency);
+}
+
+function displayManualCategory(containerId, phrases) {
+  const container = document.getElementById(containerId);
+  if (!container || !phrases || phrases.length === 0) {
+    if (container) container.innerHTML = '<p class="text-gray-600">データがありません</p>';
+    return;
+  }
+
+  container.innerHTML = phrases.map(p => {
+    let badgeClass = 'bg-blue-100 text-blue-800';
+    let iconClass = 'fa-check-circle';
+    
+    if (p.phrase_type === 'NG例') {
+      badgeClass = 'bg-red-100 text-red-800';
+      iconClass = 'fa-times-circle';
+    } else if (p.phrase_type === 'ルール') {
+      badgeClass = 'bg-green-100 text-green-800';
+      iconClass = 'fa-book';
+    } else if (p.phrase_type === '注意') {
+      badgeClass = 'bg-yellow-100 text-yellow-800';
+      iconClass = 'fa-exclamation-triangle';
+    }
+
+    return `
+      <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <div class="flex items-start space-x-3">
+          <i class="fas ${iconClass} text-xl mt-1 ${p.phrase_type === 'NG例' ? 'text-red-600' : 'text-green-600'}"></i>
+          <div class="flex-1">
+            <div class="flex items-center mb-2">
+              <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full ${badgeClass}">
+                ${p.phrase_type}
+              </span>
+              ${p.situation ? `<span class="ml-2 text-sm text-gray-600">${p.situation}</span>` : ''}
+            </div>
+            <p class="text-gray-800 leading-relaxed">${p.phrase_text}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==========================================
+// エクスポート機能
+// ==========================================
+
+async function exportToCSV() {
+  try {
+    const response = await axios.get(`${API_BASE}/consultations?page=1&limit=10000`);
+    const consultations = response.data.consultations;
+
+    if (!consultations || consultations.length === 0) {
+      showError('エクスポートするデータがありません');
+      return;
+    }
+
+    // CSVヘッダー
+    const headers = [
+      'ID', '受付日時', '対応者', '名前', '年齢', '性別', '電話番号', 
+      '相談者の関係', '依存症種類', '期間', '頻度', '重症度',
+      '緊急度', '相談内容', '特記事項', '作成日時'
+    ];
+
+    // CSVデータ作成
+    const csvRows = [headers.join(',')];
+    
+    consultations.forEach(c => {
+      const row = [
+        c.id,
+        `"${formatDateTime(c.reception_datetime)}"`,
+        `"${c.staff_name}"`,
+        `"${c.caller_name || ''}"`,
+        c.caller_age || '',
+        `"${c.caller_gender || ''}"`,
+        `"${c.caller_phone || ''}"`,
+        `"${c.caller_relationship || ''}"`,
+        `"${c.addiction_types ? JSON.parse(c.addiction_types).join('; ') : ''}"`,
+        `"${c.addiction_period || ''}"`,
+        `"${c.addiction_frequency || ''}"`,
+        `"${c.addiction_severity || ''}"`,
+        `"${c.emergency_level}"`,
+        `"${(c.consultation_content || '').replace(/"/g, '""')}"`,
+        `"${(c.notes || '').replace(/"/g, '""')}"`,
+        `"${formatDateTime(c.created_at)}"`
+      ];
+      csvRows.push(row.join(','));
+    });
+
+    // CSVファイルをダウンロード
+    const csvContent = '\uFEFF' + csvRows.join('\n'); // BOM追加（Excel対応）
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `相談記録_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showSuccess('CSVファイルをダウンロードしました');
+  } catch (error) {
+    console.error('CSV出力エラー:', error);
+    showError('CSV出力に失敗しました');
+  }
+}
+
+async function exportToPDF(id) {
+  try {
+    const response = await axios.get(`${API_BASE}/consultations/${id}`);
+    const c = response.data.consultation;
+
+    // PDFライブラリ（jsPDF）を使用
+    // 注: 実際の実装では jsPDF をCDN経由で読み込む必要があります
+    showSuccess('PDF出力機能は次のアップデートで実装予定です');
+    
+    // 暫定的にブラウザの印刷ダイアログを表示
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>相談記録 - ${c.caller_name || '匿名'}</title>
+          <style>
+            body { font-family: 'MS PGothic', sans-serif; padding: 20px; }
+            h1 { color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px; }
+            h2 { color: #374151; margin-top: 20px; border-bottom: 1px solid #d1d5db; padding-bottom: 5px; }
+            .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+            .info-item { padding: 5px; }
+            .label { font-weight: bold; }
+            .emergency-high { color: #dc2626; font-weight: bold; }
+            .emergency-mid { color: #f59e0b; font-weight: bold; }
+            .emergency-low { color: #10b981; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <h1>相模原ダルク 相談記録</h1>
+          
+          <h2>基本情報</h2>
+          <div class="info-grid">
+            <div class="info-item"><span class="label">受付日時:</span> ${formatDateTime(c.reception_datetime)}</div>
+            <div class="info-item"><span class="label">対応者:</span> ${c.staff_name}</div>
+            <div class="info-item"><span class="label">お名前:</span> ${c.caller_name || '匿名'}</div>
+            <div class="info-item"><span class="label">年齢:</span> ${c.caller_age ? c.caller_age + '歳' : '未記入'}</div>
+            <div class="info-item"><span class="label">性別:</span> ${c.caller_gender || '未記入'}</div>
+            <div class="info-item"><span class="label">電話番号:</span> ${c.caller_phone || '未記入'}</div>
+          </div>
+
+          <h2>依存症情報</h2>
+          <div class="info-item"><span class="label">種類:</span> ${c.addiction_types ? JSON.parse(c.addiction_types).join(', ') : '未記入'}</div>
+          <div class="info-item"><span class="label">期間:</span> ${c.addiction_period || '未記入'}</div>
+          <div class="info-item"><span class="label">頻度:</span> ${c.addiction_frequency || '未記入'}</div>
+
+          <h2>緊急度評価</h2>
+          <div class="info-item emergency-${c.emergency_level === '高' ? 'high' : c.emergency_level === '中' ? 'mid' : 'low'}">
+            緊急度: ${c.emergency_level}
+          </div>
+
+          <h2>相談内容</h2>
+          <div style="white-space: pre-wrap; padding: 10px; background: #f9fafb; border-radius: 5px;">
+            ${c.consultation_content || '未記入'}
+          </div>
+
+          ${c.notes ? `
+            <h2>特記事項</h2>
+            <div style="white-space: pre-wrap; padding: 10px; background: #f9fafb; border-radius: 5px;">
+              ${c.notes}
+            </div>
+          ` : ''}
+
+          <div style="margin-top: 40px; text-align: center; color: #6b7280; font-size: 12px;">
+            一般社団法人相模原ダルク | 代表理事: 田中秀泰
+          </div>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  } catch (error) {
+    console.error('PDF出力エラー:', error);
+    showError('PDF出力に失敗しました');
+  }
 }

@@ -27,22 +27,33 @@ const ADDICTION_TYPES = [
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-  await initApp();
+  const app = document.getElementById('app');
+  try {
+    app.innerHTML = '<div style="padding: 20px; text-align: center;">読み込み中...</div>';
+    await initApp();
+  } catch (error) {
+    app.innerHTML = `<div style="padding: 20px; color: red;">エラー: ${error.message}</div>`;
+  }
 });
 
 async function initApp() {
   try {
-    // スタッフ情報とフレーズデータを取得
-    await Promise.all([
+    // 初期画面を表示（データ取得前に表示）
+    showHomePage();
+    
+    // スタッフ情報とフレーズデータを非同期で取得
+    Promise.all([
       loadStaffList(),
       loadPhrases()
-    ]);
-    
-    // 初期画面を表示
-    showHomePage();
+    ]).catch(err => console.error('データ取得エラー:', err));
   } catch (error) {
     console.error('初期化エラー:', error);
-    showError('アプリケーションの初期化に失敗しました');
+    const app = document.getElementById('app');
+    app.innerHTML = `<div style="padding: 20px; background: white; margin: 20px;">
+      <h2 style="color: red;">初期化エラー</h2>
+      <p>${error.message}</p>
+      <pre>${error.stack}</pre>
+    </div>`;
   }
 }
 

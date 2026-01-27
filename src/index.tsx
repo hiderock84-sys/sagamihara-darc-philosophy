@@ -368,11 +368,105 @@ app.get('/', (c) => {
           }
         </style>
     </head>
-    <body class="bg-gray-50">
-        <div id="app"></div>
-        
-        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
-        <script src="/static/app.js"></script>
+    <body class="bg-gray-100">
+        <!-- ヘッダー -->
+        <header class="bg-blue-700 text-white shadow-lg">
+          <div class="container mx-auto px-4 py-4">
+            <div style="display: flex; align-items: start; justify-content: space-between;">
+              <!-- 左側：タイトル -->
+              <div>
+                <h1 class="text-2xl font-bold leading-tight">相模原ダルク</h1>
+                <p class="text-sm text-blue-100 mt-1">電話対応支援システム</p>
+              </div>
+              
+              <!-- 右側：電話番号 -->
+              <div style="text-align: right; font-size: 12px;">
+                <p style="font-weight: 600; white-space: nowrap;">TEL: 042-707-0391</p>
+                <p style="color: #bfdbfe; margin-top: 2px;">平日 9:00-17:00</p>
+                <p style="color: #bfdbfe;">土祝日 9:00-12:00</p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="container mx-auto px-4 py-6">
+          <!-- 機能メニュー（iOS Settings風） -->
+          <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px;">
+            <!-- 新規相談受付 -->
+            <a href="/new-consultation" style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #f3f4f6; text-decoration: none;">
+              <div style="display: flex; align-items: center;">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #3b82f6; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; margin-right: 12px;">
+                  📞
+                </div>
+                <div>
+                  <h3 style="font-size: 16px; font-weight: 600; color: #111827; margin: 0;">新規相談受付</h3>
+                  <p style="font-size: 12px; color: #6b7280; margin: 4px 0 0 0;">電話対応を開始</p>
+                </div>
+              </div>
+              <span style="color: #9ca3af;">›</span>
+            </a>
+
+            <!-- 相談履歴 -->
+            <a href="/history" style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #f3f4f6; text-decoration: none;">
+              <div style="display: flex; align-items: center;">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #10b981; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; margin-right: 12px;">
+                  🕐
+                </div>
+                <div>
+                  <h3 style="font-size: 16px; font-weight: 600; color: #111827; margin: 0;">相談履歴</h3>
+                  <p style="font-size: 12px; color: #6b7280; margin: 4px 0 0 0;">過去の相談記録を確認</p>
+                </div>
+              </div>
+              <span style="color: #9ca3af;">›</span>
+            </a>
+
+            <!-- 統計情報 -->
+            <a href="/stats" style="display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #f3f4f6; text-decoration: none;">
+              <div style="display: flex; align-items: center;">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #8b5cf6; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; margin-right: 12px;">
+                  📊
+                </div>
+                <div>
+                  <h3 style="font-size: 16px; font-weight: 600; color: #111827; margin: 0;">統計情報</h3>
+                  <p style="font-size: 12px; color: #6b7280; margin: 4px 0 0 0;">データを分析</p>
+                </div>
+              </div>
+              <span style="color: #9ca3af;">›</span>
+            </a>
+
+            <!-- 対応マニュアル -->
+            <a href="/manual" style="display: flex; align-items: center; justify-content: space-between; padding: 16px; text-decoration: none;">
+              <div style="display: flex; align-items: center;">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #f97316; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; margin-right: 12px;">
+                  📖
+                </div>
+                <div>
+                  <h3 style="font-size: 16px; font-weight: 600; color: #111827; margin: 0;">対応マニュアル</h3>
+                  <p style="font-size: 12px; color: #6b7280; margin: 4px 0 0 0;">フレーズを確認</p>
+                </div>
+              </div>
+              <span style="color: #9ca3af;">›</span>
+            </a>
+          </div>
+
+          <!-- 統計情報 -->
+          <div style="background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 16px; text-align: center;">
+            <p style="font-size: 14px; color: #374151; margin: 0;">
+              本日件数: <span style="font-weight: 600;">0 件</span> | 
+              今週件数: <span style="font-weight: 600;">0 件</span>
+            </p>
+          </div>
+        </main>
+
+        <!-- フッター -->
+        <footer style="background: #1f2937; color: white; margin-top: 48px; padding: 24px 0;">
+          <div class="container mx-auto px-4" style="text-align: center;">
+            <p style="font-size: 14px;">© 2026 一般社団法人相模原ダルク - 電話対応支援システム</p>
+            <p style="font-size: 16px; font-weight: 600; margin-top: 12px;">人は必ずやり直せる--</p>
+            <p style="font-size: 14px; color: #93c5fd; font-weight: 500; margin-top: 8px;">--相模原ダルクの挑戦--</p>
+          </div>
+        </footer>
     </body>
     </html>
   `)

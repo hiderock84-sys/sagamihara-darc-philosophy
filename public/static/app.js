@@ -119,92 +119,97 @@ async function saveConsultation(data) {
 function showHomePage() {
   const app = document.getElementById('app');
   app.innerHTML = `
-    <div class="min-h-screen">
+    <div class="min-h-screen bg-gray-100">
       <!-- ヘッダー -->
-      <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
-        <div class="container mx-auto px-6 md:px-8 py-4 md:py-6">
-          <!-- タイトル -->
-          <div class="text-center">
-            <h1 class="text-3xl md:text-5xl font-bold leading-tight">相模原ダルク</h1>
-            <p class="text-base md:text-lg text-blue-100 mt-0">電話対応支援システム</p>
-          </div>
-          
-          <!-- 電話番号（中央下部） -->
-          <div class="text-center mt-3">
-            <p class="text-xs md:text-sm font-semibold text-white">
-              <i class="fas fa-phone mr-1"></i>
-              TEL: 042-707-0391
-            </p>
-            <p class="text-xs text-blue-200 mt-1">
-              平日 9:00-17:00 / 土祝日 9:00-12:00
-            </p>
+      <header class="bg-blue-700 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+          <div class="flex items-start justify-between">
+            <!-- 左側：タイトル -->
+            <div>
+              <h1 class="text-2xl font-bold leading-tight">相模原ダルク</h1>
+              <p class="text-sm text-blue-100 mt-1">電話対応支援システム</p>
+            </div>
+            
+            <!-- 右側：電話番号 -->
+            <div class="text-right text-xs">
+              <p class="font-semibold whitespace-nowrap">TEL: 042-707-0391</p>
+              <p class="text-blue-200 mt-0.5">平日 9:00-17:00</p>
+              <p class="text-blue-200">土祝日 9:00-12:00</p>
+            </div>
           </div>
         </div>
       </header>
 
       <!-- メインコンテンツ -->
-      <main class="container mx-auto px-4 py-8">
-        <!-- 機能メニュー -->
-        <div class="space-y-4 mb-8 max-w-2xl mx-auto">
+      <main class="container mx-auto px-4 py-6">
+        <!-- 機能メニュー（iOS Settings風） -->
+        <div class="bg-white rounded-xl overflow-hidden shadow-sm mb-6">
           <!-- 新規相談受付 -->
           <button onclick="showNewConsultationPage()" 
-                  class="w-full bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6 flex items-center group hover:bg-blue-50">
-            <div class="text-5xl text-blue-600 group-hover:scale-110 transition-transform mr-6">
-              <i class="fas fa-phone-alt"></i>
+                  class="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors border-b border-gray-100">
+            <div class="flex items-center">
+              <div class="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center text-white text-xl mr-3">
+                <i class="fas fa-phone-alt"></i>
+              </div>
+              <div class="text-left">
+                <h3 class="text-base font-semibold text-gray-900">新規相談受付</h3>
+                <p class="text-xs text-gray-500">電話対応を開始</p>
+              </div>
             </div>
-            <div class="text-left">
-              <h3 class="text-xl font-bold text-gray-800 mb-1">新規相談受付</h3>
-              <p class="text-gray-600 text-sm">電話対応を開始する</p>
-            </div>
+            <i class="fas fa-chevron-right text-gray-400"></i>
           </button>
 
           <!-- 相談履歴 -->
           <button onclick="showHistoryPage()" 
-                  class="w-full bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6 flex items-center group hover:bg-green-50">
-            <div class="text-5xl text-green-600 group-hover:scale-110 transition-transform mr-6">
-              <i class="fas fa-history"></i>
+                  class="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors border-b border-gray-100">
+            <div class="flex items-center">
+              <div class="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center text-white text-xl mr-3">
+                <i class="fas fa-history"></i>
+              </div>
+              <div class="text-left">
+                <h3 class="text-base font-semibold text-gray-900">相談履歴</h3>
+                <p class="text-xs text-gray-500">過去の相談記録を確認</p>
+              </div>
             </div>
-            <div class="text-left">
-              <h3 class="text-xl font-bold text-gray-800 mb-1">相談履歴</h3>
-              <p class="text-gray-600 text-sm">過去の相談記録を確認</p>
-            </div>
+            <i class="fas fa-chevron-right text-gray-400"></i>
           </button>
 
           <!-- 統計情報 -->
           <button onclick="showStatsPage()" 
-                  class="w-full bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6 flex items-center group hover:bg-purple-50">
-            <div class="text-5xl text-purple-600 group-hover:scale-110 transition-transform mr-6">
-              <i class="fas fa-chart-bar"></i>
+                  class="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors border-b border-gray-100">
+            <div class="flex items-center">
+              <div class="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center text-white text-xl mr-3">
+                <i class="fas fa-chart-bar"></i>
+              </div>
+              <div class="text-left">
+                <h3 class="text-base font-semibold text-gray-900">統計情報</h3>
+                <p class="text-xs text-gray-500">データを分析</p>
+              </div>
             </div>
-            <div class="text-left">
-              <h3 class="text-xl font-bold text-gray-800 mb-1">統計情報</h3>
-              <p class="text-gray-600 text-sm">相談傾向を分析</p>
-            </div>
+            <i class="fas fa-chevron-right text-gray-400"></i>
           </button>
 
           <!-- 対応マニュアル -->
           <button onclick="showManualPage()" 
-                  class="w-full bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6 flex items-center group hover:bg-orange-50">
-            <div class="text-5xl text-orange-600 group-hover:scale-110 transition-transform mr-6">
-              <i class="fas fa-book"></i>
+                  class="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+            <div class="flex items-center">
+              <div class="w-12 h-12 rounded-xl bg-orange-500 flex items-center justify-center text-white text-xl mr-3">
+                <i class="fas fa-book"></i>
+              </div>
+              <div class="text-left">
+                <h3 class="text-base font-semibold text-gray-900">対応マニュアル</h3>
+                <p class="text-xs text-gray-500">フレーズを確認</p>
+              </div>
             </div>
-            <div class="text-left">
-              <h3 class="text-xl font-bold text-gray-800 mb-1">対応マニュアル</h3>
-              <p class="text-gray-600 text-sm">対応フレーズ集を確認</p>
-            </div>
+            <i class="fas fa-chevron-right text-gray-400"></i>
           </button>
         </div>
 
-        <!-- ダッシュボード統計（簡易版） -->
-        <div id="home-stats" class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-            <i class="fas fa-tachometer-alt mr-2 text-blue-600"></i>
-            本日の概要
-          </h2>
-          <div class="text-center py-8">
-            <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
-            <p class="mt-4 text-gray-600">データを読み込み中...</p>
-          </div>
+        <!-- 統計情報（1行テキスト） -->
+        <div id="home-stats" class="bg-white rounded-xl shadow-sm p-4 text-center">
+          <p class="text-sm text-gray-600">
+            <i class="fas fa-spinner fa-spin mr-2"></i>統計情報を読み込み中...
+          </p>
         </div>
       </main>
 
@@ -229,16 +234,22 @@ async function loadAndDisplayHomeStats() {
   
   if (!stats) {
     container.innerHTML = `
-      <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-        <i class="fas fa-tachometer-alt mr-2 text-blue-600"></i>
-        本日の概要
-      </h2>
-      <p class="text-center text-gray-600">統計情報の取得に失敗しました</p>
+      <p class="text-sm text-gray-500">統計情報の取得に失敗しました</p>
     `;
     return;
   }
 
+  // 本日件数と今週件数を表示
+  const todayCount = stats.todayConsultations || 0;
+  const weekCount = stats.thisWeekConsultations || 0;
+  
   container.innerHTML = `
+    <p class="text-sm text-gray-700">
+      本日件数: <span class="font-semibold">${todayCount} 件</span> | 
+      今週件数: <span class="font-semibold">${weekCount} 件</span>
+    </p>
+  `;
+}
     <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
       <i class="fas fa-tachometer-alt mr-2 text-blue-600"></i>
       本日の概要

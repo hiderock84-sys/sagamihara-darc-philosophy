@@ -124,13 +124,18 @@ function showHomePage() {
       <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
         <div class="container mx-auto px-4 py-6">
           <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-              <img src="/static/logo.svg" alt="相模原ダルク" class="h-16 w-auto object-contain">
-              <div>
-                <h1 class="text-3xl font-bold">相模原ダルク</h1>
-                <p class="text-blue-100">電話対応支援システム</p>
-              </div>
+            <!-- 左側：ロゴ -->
+            <div class="flex items-center">
+              <img src="/static/logo.svg" alt="相模原ダルク" class="h-12 w-auto object-contain">
             </div>
+            
+            <!-- 中央：タイトル -->
+            <div class="flex-1 text-center">
+              <h1 class="text-3xl font-bold">相模原ダルク</h1>
+              <p class="text-blue-100">電話対応支援システム</p>
+            </div>
+            
+            <!-- 右側：電話番号 -->
             <div class="text-right">
               <p class="text-sm font-semibold text-white">
                 <i class="fas fa-phone mr-1"></i>

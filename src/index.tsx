@@ -317,7 +317,9 @@ app.get('/', (c) => {
     <html lang="ja">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
         <title>相模原ダルク 電話対応支援システム</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
@@ -336,6 +338,13 @@ app.get('/', (c) => {
           }
         </script>
         <style>
+          * {
+            -webkit-tap-highlight-color: transparent;
+          }
+          body {
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+          }
           .fade-in {
             animation: fadeIn 0.3s ease-in;
           }
@@ -349,6 +358,13 @@ app.get('/', (c) => {
           @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: .5; }
+          }
+          /* モバイル対応 */
+          @media (max-width: 640px) {
+            .container {
+              padding-left: 1rem;
+              padding-right: 1rem;
+            }
           }
         </style>
     </head>

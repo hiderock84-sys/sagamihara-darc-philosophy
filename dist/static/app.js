@@ -122,27 +122,30 @@ function showHomePage() {
     <div class="min-h-screen">
       <!-- ヘッダー -->
       <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
-        <div class="container mx-auto px-4 py-6">
-          <div class="flex items-center justify-between">
+        <div class="container mx-auto px-4 py-4 md:py-6">
+          <div class="flex items-center justify-between flex-wrap md:flex-nowrap gap-3">
             <!-- 左側：ロゴ -->
-            <div class="flex items-center">
-              <img src="/static/logo.svg" alt="相模原ダルク" class="h-12 w-auto object-contain">
+            <div class="flex items-center flex-shrink-0">
+              <img src="/static/logo.svg" alt="相模原ダルク" class="h-10 md:h-12 w-auto object-contain">
             </div>
             
             <!-- 中央：タイトル -->
-            <div class="flex-1 text-center">
-              <h1 class="text-3xl font-bold">相模原ダルク</h1>
-              <p class="text-blue-100">電話対応支援システム</p>
+            <div class="flex-1 text-center order-3 md:order-2 w-full md:w-auto">
+              <h1 class="text-xl md:text-3xl font-bold">相模原ダルク</h1>
+              <p class="text-xs md:text-base text-blue-100">電話対応支援システム</p>
             </div>
             
             <!-- 右側：電話番号 -->
-            <div class="text-right">
-              <p class="text-sm font-semibold text-white">
+            <div class="text-right flex-shrink-0 order-2 md:order-3">
+              <p class="text-xs md:text-sm font-semibold text-white whitespace-nowrap">
                 <i class="fas fa-phone mr-1"></i>
                 TEL: 042-707-0391
               </p>
-              <p class="text-xs text-blue-200 mt-1">
+              <p class="text-xs text-blue-200 mt-1 hidden md:block">
                 平日 9:00-17:00 / 土・祝 9:00-14:00
+              </p>
+              <p class="text-xs text-blue-200 mt-1 md:hidden">
+                平日 9:00-17:00
               </p>
             </div>
           </div>
@@ -213,7 +216,6 @@ function showHomePage() {
           <p class="text-sm">© 2026 一般社団法人相模原ダルク - 電話対応支援システム</p>
           <p class="text-base text-white font-semibold mt-3">人は必ずやり直せる--</p>
           <p class="text-sm text-blue-300 font-medium mt-2">--相模原ダルクの挑戦--</p>
-          <p class="text-xs text-gray-300 mt-2">薬物・アルコール・ギャンブル依存症を始めとする、あらゆる依存症事案に対応いたします</p>
         </div>
       </footer>
     </div>

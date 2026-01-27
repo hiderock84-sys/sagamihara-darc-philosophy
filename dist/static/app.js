@@ -122,12 +122,12 @@ function showHomePage() {
     <div class="min-h-screen">
       <!-- ヘッダー -->
       <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
-        <div class="container mx-auto px-4 py-4 md:py-6">
+        <div class="container mx-auto px-6 md:px-8 py-4 md:py-6">
           <div class="flex items-center justify-between">
             <!-- 中央：タイトル（大きく） -->
             <div class="flex-1 text-center">
-              <h1 class="text-3xl md:text-5xl font-bold">相模原ダルク</h1>
-              <p class="text-base md:text-lg text-blue-100 mt-0.5">電話対応支援システム</p>
+              <h1 class="text-3xl md:text-5xl font-bold leading-tight">相模原ダルク</h1>
+              <p class="text-base md:text-lg text-blue-100 mt-0">電話対応支援システム</p>
             </div>
             
             <!-- 右側：電話番号 -->

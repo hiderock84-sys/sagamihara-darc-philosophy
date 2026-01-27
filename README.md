@@ -74,13 +74,15 @@
 
 ## 🌐 公開URL
 
-### 開発環境（Sandbox）
-- **アプリURL**: https://3000-iko5o0a9up8u6girs6d0a-2e77fc33.sandbox.novita.ai
-- **API Base**: https://3000-iko5o0a9up8u6girs6d0a-2e77fc33.sandbox.novita.ai/api
+### 本番環境（Cloudflare Pages）
+- **本番URL**: https://sagamihara-darc.pages.dev
+- **デプロイURL**: https://c18d3d98.sagamihara-darc.pages.dev
+- **GitHub Repository**: https://github.com/hiderock84-sys/sagamihara-darc-philosophy
+- **Cloudflare Dashboard**: https://dash.cloudflare.com/e696c49d9b07a09be98acdb426cb008e/workers-and-pages/overview
 
-### 本番環境（デプロイ後）
-- **Production URL**: （デプロイ後に追加）
-- **GitHub Repository**: （GitHub連携後に追加）
+### 開発環境（Sandbox）
+- **開発URL**: https://3000-iko5o0a9up8u6girs6d0a-2e77fc33.sandbox.novita.ai
+- **API Base**: https://3000-iko5o0a9up8u6girs6d0a-2e77fc33.sandbox.novita.ai/api
 
 ## 📊 データアーキテクチャ
 
@@ -191,7 +193,13 @@
 - ✅ 全機能実装完了
 
 ### 本番環境（Cloudflare Pages）
-- ⏳ デプロイ待ち
+- ✅ **本番公開完了！**
+- ✅ GitHub連携完了
+- ✅ Cloudflare D1データベース作成完了
+- ✅ 初期データ投入完了
+- ✅ Cloudflare Pagesデプロイ完了
+- ✅ 本番環境動作確認完了
+- 🌐 **公開中**: https://sagamihara-darc.pages.dev
 
 ## 📊 実装済み機能の詳細
 

@@ -1,0 +1,103 @@
+-- 相談記録テーブル
+CREATE TABLE IF NOT EXISTS consultations (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  reception_datetime TEXT NOT NULL,
+  staff_name TEXT NOT NULL,
+  caller_name TEXT,
+  caller_age INTEGER,
+  caller_gender TEXT CHECK(caller_gender IN ('男性', '女性', 'その他')),
+  caller_phone TEXT,
+  caller_relationship TEXT CHECK(caller_relationship IN ('本人', '家族', '医療機関', '行政', 'その他')),
+  caller_relationship_detail TEXT,
+  addiction_types TEXT,
+  addiction_period TEXT,
+  addiction_frequency TEXT,
+  addiction_severity TEXT,
+  hospitalization_history TEXT CHECK(hospitalization_history IN ('あり', 'なし')),
+  hospitalization_facility TEXT,
+  outpatient_history TEXT CHECK(outpatient_history IN ('あり', 'なし')),
+  outpatient_facility TEXT,
+  medication_status TEXT CHECK(medication_status IN ('あり', 'なし')),
+  medication_name TEXT,
+  other_facility_use TEXT CHECK(other_facility_use IN ('あり', 'なし')),
+  other_facility_name TEXT,
+  emergency_use_24h BOOLEAN DEFAULT 0,
+  emergency_withdrawal BOOLEAN DEFAULT 0,
+  emergency_self_harm BOOLEAN DEFAULT 0,
+  emergency_medical_needed BOOLEAN DEFAULT 0,
+  emergency_level TEXT CHECK(emergency_level IN ('高', '中', '低')),
+  consultation_content TEXT,
+  notes TEXT,
+  interview_scheduled BOOLEAN DEFAULT 0,
+  interview_datetime TEXT,
+  followup_scheduled BOOLEAN DEFAULT 0,
+  followup_datetime TEXT,
+  coordination_needed TEXT,
+  report_completed BOOLEAN DEFAULT 0,
+  report_to TEXT,
+  check_name_contact BOOLEAN DEFAULT 0,
+  check_addiction_type BOOLEAN DEFAULT 0,
+  check_emergency_level BOOLEAN DEFAULT 0,
+  check_next_action BOOLEAN DEFAULT 0,
+  check_followup_date BOOLEAN DEFAULT 0,
+  check_record_completed BOOLEAN DEFAULT 0,
+  created_at TEXT DEFAULT (datetime('now', 'localtime')),
+  updated_at TEXT DEFAULT (datetime('now', 'localtime'))
+);
+
+-- 対応フレーズテーブル
+CREATE TABLE IF NOT EXISTS response_phrases (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  category TEXT NOT NULL,
+  phase TEXT NOT NULL,
+  situation TEXT,
+  phrase_type TEXT CHECK(phrase_type IN ('OK例', 'NG例', 'ルール', '注意')),
+  phrase_text TEXT NOT NULL,
+  sort_order INTEGER DEFAULT 0,
+  created_at TEXT DEFAULT (datetime('now', 'localtime'))
+);
+
+-- スタッフテーブル
+CREATE TABLE IF NOT EXISTS staff (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  role TEXT,
+  is_active BOOLEAN DEFAULT 1,
+  created_at TEXT DEFAULT (datetime('now', 'localtime'))
+);
+
+-- インデックス作成
+CREATE INDEX IF NOT EXISTS idx_consultations_datetime ON consultations(reception_datetime);
+CREATE INDEX IF NOT EXISTS idx_consultations_emergency ON consultations(emergency_level);
+CREATE INDEX IF NOT EXISTS idx_consultations_staff ON consultations(staff_name);
+CREATE INDEX IF NOT EXISTS idx_consultations_created ON consultations(created_at);
+CREATE INDEX IF NOT EXISTS idx_response_phrases_category ON response_phrases(category);
+CREATE INDEX IF NOT EXISTS idx_staff_active ON staff(is_active);
+
+-- スタッフ初期データ
+INSERT INTO staff (name, role, is_active) VALUES 
+  ('田中秀泰', '代表理事', 1),
+  ('上級スタッフA', '上級スタッフ', 1),
+  ('スタッフB', 'スタッフ', 1);
+
+-- 対応フレーズ初期データ
+INSERT INTO response_phrases (category, phase, situation, phrase_type, phrase_text, sort_order) VALUES
+  ('opening', '第1段階', 'オープニング文言', 'OK例', 'お電話ありがとうございます。相模原ダルクの〇〇と申します。本日はどのようなご相談でしょうか？', 1),
+  ('opening', '第1段階', 'オープニング文言', 'NG例', 'はい、相模原ダルクです。', 2),
+  ('opening', '第1段階', 'オープニング文言', 'ルール', '必ず名前を名乗り、相手の話を聞く姿勢を示す', 3),
+  ('listening', '第2段階', '傾聴の基本', 'ルール', '相手の話を遮らず、最後まで聞く', 1),
+  ('listening', '第2段階', '傾聴の基本', 'OK例', 'そうだったんですね。それはとてもお辛い状況だったと思います。', 2),
+  ('listening', '第2段階', '傾聴の基本', 'OK例', 'よくお話しくださいました。勇気を出して電話していただき、ありがとうございます。', 3),
+  ('listening', '第2段階', '傾聴の基本', 'NG例', 'それくらい大したことないですよ。', 4),
+  ('listening', '第2段階', '傾聴の基本', 'NG例', 'もっと頑張らないとダメですよ。', 5),
+  ('information', '第3段階', '施設概要', 'OK例', '相模原ダルクは、薬物・アルコール・ギャンブルなど様々な依存症からの回復を支援する施設です。同じ経験を持つ仲間と共に、回復のプログラムに取り組んでいます。', 1),
+  ('information', '第3段階', '対応可能依存症', 'OK例', '当施設では、薬物依存、アルコール依存、ギャンブル依存、ゲーム依存、ネット・スマホ依存、処方薬・市販薬依存、窃盗、性依存、共依存、食行動の問題など、幅広い依存症に対応しております。', 2),
+  ('information', '第3段階', '面談予約', 'OK例', 'まずは一度、施設にお越しいただき、面談をさせていただければと思います。ご都合の良い日時はございますか？', 3),
+  ('emergency', '緊急対応', '自殺危険', 'OK例', '今、あなたが大変辛い思いをされていること、本当に心に響いています。でも、死ぬ必要はありません。あなたの人生は、まだ始まったばかりです。今すぐ、一緒に専門のサポートを受けましょう。', 1),
+  ('emergency', '緊急対応', '24時間以内使用', '注意', '医療機関への受診を最優先に案内する', 2),
+  ('emergency', '緊急対応', '離脱症状', '注意', '緊急性が高い場合は救急車を呼ぶことも検討する', 3),
+  ('emergency', '緊急対応', '自傷他害', '注意', '警察・救急への連絡を躊躇しない', 4),
+  ('closing', '第4段階', '通話終了前確認', 'ルール', '名前と連絡先を必ず確認する', 1),
+  ('closing', '第4段階', '通話終了前確認', 'ルール', '緊急度を評価し、次のアクションを明確にする', 2),
+  ('closing', '第4段階', '通話終了前確認', 'ルール', 'フォローアップ日を設定する', 3),
+  ('closing', '第4段階', '通話終了', 'OK例', '本日はお電話いただき、ありがとうございました。◯月◯日の◯時にお待ちしております。それまでに何かございましたら、いつでもお電話ください。', 4);

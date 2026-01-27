@@ -125,7 +125,7 @@ function showHomePage() {
         <div class="container mx-auto px-4 py-6">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
-              <img src="/logo.png" alt="相模原ダルク" class="h-12 w-auto object-contain">
+              <img src="/logo.svg" alt="相模原ダルク" class="h-16 w-auto object-contain">
               <div>
                 <h1 class="text-3xl font-bold">相模原ダルク</h1>
                 <p class="text-blue-100">電話対応支援システム</p>

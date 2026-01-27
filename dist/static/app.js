@@ -132,8 +132,13 @@ function showHomePage() {
               </div>
             </div>
             <div class="text-right">
-              <p class="text-sm text-blue-100">一般社団法人相模原ダルク</p>
-              <p class="text-xs text-blue-200">代表理事: 田中秀泰</p>
+              <p class="text-sm font-semibold text-white">
+                <i class="fas fa-phone mr-1"></i>
+                TEL: 042-707-0391
+              </p>
+              <p class="text-xs text-blue-200 mt-1">
+                平日 9:00-17:00 / 土・祝 9:00-14:00
+              </p>
             </div>
           </div>
         </div>

@@ -123,26 +123,21 @@ function showHomePage() {
       <!-- ヘッダー -->
       <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
         <div class="container mx-auto px-6 md:px-8 py-4 md:py-6">
-          <div class="flex items-center justify-between">
-            <!-- 中央：タイトル（大きく） -->
-            <div class="flex-1 text-center">
-              <h1 class="text-3xl md:text-5xl font-bold leading-tight">相模原ダルク</h1>
-              <p class="text-base md:text-lg text-blue-100 mt-0">電話対応支援システム</p>
-            </div>
-            
-            <!-- 右側：電話番号 -->
-            <div class="text-right flex-shrink-0 ml-4">
-              <p class="text-xs md:text-sm font-semibold text-white whitespace-nowrap">
-                <i class="fas fa-phone mr-1"></i>
-                TEL: 042-707-0391
-              </p>
-              <p class="text-xs text-blue-200 mt-1">
-                平日 9:00-17:00
-              </p>
-              <p class="text-xs text-blue-200">
-                土祝日 9:00-12:00
-              </p>
-            </div>
+          <!-- タイトル -->
+          <div class="text-center">
+            <h1 class="text-3xl md:text-5xl font-bold leading-tight">相模原ダルク</h1>
+            <p class="text-base md:text-lg text-blue-100 mt-0">電話対応支援システム</p>
+          </div>
+          
+          <!-- 電話番号（中央下部） -->
+          <div class="text-center mt-3">
+            <p class="text-xs md:text-sm font-semibold text-white">
+              <i class="fas fa-phone mr-1"></i>
+              TEL: 042-707-0391
+            </p>
+            <p class="text-xs text-blue-200 mt-1">
+              平日 9:00-17:00 / 土祝日 9:00-12:00
+            </p>
           </div>
         </div>
       </header>
@@ -150,45 +145,53 @@ function showHomePage() {
       <!-- メインコンテンツ -->
       <main class="container mx-auto px-4 py-8">
         <!-- 機能メニュー -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="space-y-4 mb-8 max-w-2xl mx-auto">
           <!-- 新規相談受付 -->
           <button onclick="showNewConsultationPage()" 
-                  class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6 text-center group hover:bg-blue-50">
-            <div class="text-5xl mb-4 text-blue-600 group-hover:scale-110 transition-transform">
+                  class="w-full bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6 flex items-center group hover:bg-blue-50">
+            <div class="text-5xl text-blue-600 group-hover:scale-110 transition-transform mr-6">
               <i class="fas fa-phone-alt"></i>
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">新規相談受付</h3>
-            <p class="text-gray-600 text-sm">電話対応を開始する</p>
+            <div class="text-left">
+              <h3 class="text-xl font-bold text-gray-800 mb-1">新規相談受付</h3>
+              <p class="text-gray-600 text-sm">電話対応を開始する</p>
+            </div>
           </button>
 
           <!-- 相談履歴 -->
           <button onclick="showHistoryPage()" 
-                  class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6 text-center group hover:bg-green-50">
-            <div class="text-5xl mb-4 text-green-600 group-hover:scale-110 transition-transform">
+                  class="w-full bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6 flex items-center group hover:bg-green-50">
+            <div class="text-5xl text-green-600 group-hover:scale-110 transition-transform mr-6">
               <i class="fas fa-history"></i>
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">相談履歴</h3>
-            <p class="text-gray-600 text-sm">過去の相談記録を確認</p>
+            <div class="text-left">
+              <h3 class="text-xl font-bold text-gray-800 mb-1">相談履歴</h3>
+              <p class="text-gray-600 text-sm">過去の相談記録を確認</p>
+            </div>
           </button>
 
           <!-- 統計情報 -->
           <button onclick="showStatsPage()" 
-                  class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6 text-center group hover:bg-purple-50">
-            <div class="text-5xl mb-4 text-purple-600 group-hover:scale-110 transition-transform">
+                  class="w-full bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6 flex items-center group hover:bg-purple-50">
+            <div class="text-5xl text-purple-600 group-hover:scale-110 transition-transform mr-6">
               <i class="fas fa-chart-bar"></i>
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">統計情報</h3>
-            <p class="text-gray-600 text-sm">相談傾向を分析</p>
+            <div class="text-left">
+              <h3 class="text-xl font-bold text-gray-800 mb-1">統計情報</h3>
+              <p class="text-gray-600 text-sm">相談傾向を分析</p>
+            </div>
           </button>
 
           <!-- 対応マニュアル -->
           <button onclick="showManualPage()" 
-                  class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6 text-center group hover:bg-orange-50">
-            <div class="text-5xl mb-4 text-orange-600 group-hover:scale-110 transition-transform">
+                  class="w-full bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6 flex items-center group hover:bg-orange-50">
+            <div class="text-5xl text-orange-600 group-hover:scale-110 transition-transform mr-6">
               <i class="fas fa-book"></i>
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">対応マニュアル</h3>
-            <p class="text-gray-600 text-sm">対応フレーズ集を確認</p>
+            <div class="text-left">
+              <h3 class="text-xl font-bold text-gray-800 mb-1">対応マニュアル</h3>
+              <p class="text-gray-600 text-sm">対応フレーズ集を確認</p>
+            </div>
           </button>
         </div>
 

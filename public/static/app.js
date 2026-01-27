@@ -124,14 +124,14 @@ function showHomePage() {
       <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
         <div class="container mx-auto px-4 py-4 md:py-6">
           <div class="flex items-center justify-between">
-            <!-- 左側：タイトル（大きく） -->
-            <div class="flex-1">
-              <h1 class="text-2xl md:text-4xl font-bold">相模原ダルク</h1>
-              <p class="text-sm md:text-lg text-blue-100">電話対応支援システム</p>
+            <!-- 中央：タイトル（大きく） -->
+            <div class="flex-1 text-center">
+              <h1 class="text-3xl md:text-5xl font-bold">相模原ダルク</h1>
+              <p class="text-xs md:text-sm text-blue-100 mt-1">電話対応支援システム</p>
             </div>
             
             <!-- 右側：電話番号 -->
-            <div class="text-right flex-shrink-0">
+            <div class="text-right flex-shrink-0 ml-4">
               <p class="text-xs md:text-sm font-semibold text-white whitespace-nowrap">
                 <i class="fas fa-phone mr-1"></i>
                 TEL: 042-707-0391

@@ -469,9 +469,11 @@ app.get('/', (c) => {
         </main>
 
         <!-- フッター -->
-        <footer style="background: #1f2937; color: white; margin-top: 48px; padding: 20px 0;">
+        <footer style="background: #1f2937; color: white; margin-top: 48px; padding: 24px 0;">
           <div class="container mx-auto px-4" style="text-align: center;">
-            <p style="font-size: 12px; margin: 0;">© 2024 Sagamihara DARC. All rights reserved.</p>
+            <p style="font-size: 14px;">© 2026 一般社団法人相模原ダルク - 電話対応支援システム</p>
+            <p style="font-size: 16px; font-weight: 600; margin-top: 12px;">人は必ずやり直せる--</p>
+            <p style="font-size: 14px; color: #93c5fd; font-weight: 500; margin-top: 8px;">--相模原ダルクの挑戦--</p>
           </div>
         </footer>
     </body>

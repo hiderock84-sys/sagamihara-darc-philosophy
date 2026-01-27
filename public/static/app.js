@@ -213,7 +213,7 @@ function showHomePage() {
           <p class="text-sm">© 2026 一般社団法人相模原ダルク - 電話対応支援システム</p>
           <p class="text-base text-white font-semibold mt-3">人は必ずやり直せる--</p>
           <p class="text-sm text-blue-300 font-medium mt-2">--相模原ダルクの挑戦--</p>
-          <p class="text-xs text-gray-300 mt-2">薬物・アルコール・ギャンブルを始めあらゆる依存症事案に対応いたします</p>
+          <p class="text-xs text-gray-300 mt-2">薬物・アルコール・ギャンブル依存症を始めとする、あらゆる依存症事案に対応いたします</p>
         </div>
       </footer>
     </div>

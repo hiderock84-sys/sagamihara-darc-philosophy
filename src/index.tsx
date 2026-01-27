@@ -368,112 +368,114 @@ app.get('/', (c) => {
           }
         </style>
     </head>
-    <body class="bg-gray-100">
+    <body style="background: #f5f5f5; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
         <!-- ヘッダー -->
-        <header class="bg-blue-500 text-white shadow-lg">
-          <div class="container mx-auto px-4 py-6">
+        <header style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="max-width: 480px; margin: 0 auto; padding: 16px 20px 20px 20px;">
             <!-- 電話番号（中央上部・小さく） -->
-            <div style="text-align: center; font-size: 11px; margin-bottom: 8px;">
-              <p style="margin: 0;">TEL: 042-707-0391</p>
-              <p style="margin: 0; opacity: 0.9;">平日 9:00-17:00 / 土祝日 9:00-12:00</p>
+            <div style="text-align: center; font-size: 10px; margin-bottom: 10px; opacity: 0.95;">
+              <p style="margin: 0; font-weight: 500;">TEL: 042-707-0391</p>
+              <p style="margin: 2px 0 0 0;">平日 9:00-17:00 / 土祝日 9:00-12:00</p>
             </div>
             
             <!-- タイトル（中央・大きく） -->
             <div style="text-align: center;">
-              <h1 style="font-size: 28px; font-weight: bold; margin: 0; line-height: 1.2;">相模原ダルク</h1>
-              <p style="font-size: 16px; margin: 4px 0 0 0; opacity: 0.95;">電話対応支援システム</p>
+              <h1 style="font-size: 32px; font-weight: 800; margin: 0; line-height: 1.1; letter-spacing: -0.5px;">相模原ダルク</h1>
+              <p style="font-size: 15px; margin: 6px 0 0 0; font-weight: 500; opacity: 0.95;">電話対応支援システム</p>
             </div>
           </div>
         </header>
 
         <!-- メインコンテンツ -->
-        <main class="container mx-auto px-4 py-6">
-          <!-- 機能メニュー（iOS Settings風・影強化） -->
-          <div style="margin-bottom: 24px;">
+        <main style="max-width: 480px; margin: 0 auto; padding: 16px;">
+          <!-- 機能メニュー -->
+          <div style="margin-bottom: 20px;">
             <!-- 新規相談受付 -->
-            <a href="/new-consultation" style="display: flex; align-items: center; justify-content: space-between; padding: 20px; background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 16px; text-decoration: none;">
-              <div style="display: flex; align-items: center;">
-                <div style="width: 56px; height: 56px; border-radius: 14px; background: #3b82f6; display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; margin-right: 16px;">
+            <a href="/new-consultation" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 12px; text-decoration: none;">
+              <div style="display: flex; align-items: center; flex: 1;">
+                <div style="width: 60px; height: 60px; border-radius: 16px; background: #3b82f6; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; margin-right: 15px; flex-shrink: 0;">
                   📞
                 </div>
-                <div>
-                  <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0;">新規相談受付</h3>
-                  <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">電話対応を開始する</p>
+                <div style="flex: 1;">
+                  <h3 style="font-size: 17px; font-weight: 700; color: #1f2937; margin: 0 0 2px 0;">新規相談受付</h3>
+                  <p style="font-size: 13px; color: #6b7280; margin: 0;">電話対応を開始する</p>
                 </div>
               </div>
-              <span style="color: #9ca3af; font-size: 20px; margin-left: 16px;">›</span>
+              <svg style="width: 24px; height: 24px; color: #d1d5db; flex-shrink: 0; margin-left: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
             </a>
 
             <!-- 相談履歴 -->
-            <a href="/history" style="display: flex; align-items: center; justify-content: space-between; padding: 20px; background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 16px; text-decoration: none;">
-              <div style="display: flex; align-items: center;">
-                <div style="width: 56px; height: 56px; border-radius: 14px; background: #10b981; display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; margin-right: 16px;">
+            <a href="/history" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 12px; text-decoration: none;">
+              <div style="display: flex; align-items: center; flex: 1;">
+                <div style="width: 60px; height: 60px; border-radius: 16px; background: #10b981; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; margin-right: 15px; flex-shrink: 0;">
                   🕐
                 </div>
-                <div>
-                  <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0;">相談履歴</h3>
-                  <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">過去の相談記録を確認</p>
+                <div style="flex: 1;">
+                  <h3 style="font-size: 17px; font-weight: 700; color: #1f2937; margin: 0 0 2px 0;">相談履歴</h3>
+                  <p style="font-size: 13px; color: #6b7280; margin: 0;">過去の相談記録を確認</p>
                 </div>
               </div>
-              <span style="color: #9ca3af; font-size: 20px; margin-left: 16px;">›</span>
+              <svg style="width: 24px; height: 24px; color: #d1d5db; flex-shrink: 0; margin-left: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
             </a>
 
             <!-- 統計情報 -->
-            <a href="/stats" style="display: flex; align-items: center; justify-content: space-between; padding: 20px; background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 16px; text-decoration: none;">
-              <div style="display: flex; align-items: center;">
-                <div style="width: 56px; height: 56px; border-radius: 14px; background: #8b5cf6; display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; margin-right: 16px;">
+            <a href="/stats" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 12px; text-decoration: none;">
+              <div style="display: flex; align-items: center; flex: 1;">
+                <div style="width: 60px; height: 60px; border-radius: 16px; background: #8b5cf6; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; margin-right: 15px; flex-shrink: 0;">
                   📊
                 </div>
-                <div>
-                  <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0;">統計情報</h3>
-                  <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">相談傾向を分析</p>
+                <div style="flex: 1;">
+                  <h3 style="font-size: 17px; font-weight: 700; color: #1f2937; margin: 0 0 2px 0;">統計情報</h3>
+                  <p style="font-size: 13px; color: #6b7280; margin: 0;">相談傾向を分析</p>
                 </div>
               </div>
-              <span style="color: #9ca3af; font-size: 20px; margin-left: 16px;">›</span>
+              <svg style="width: 24px; height: 24px; color: #d1d5db; flex-shrink: 0; margin-left: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
             </a>
 
             <!-- 対応マニュアル -->
-            <a href="/manual" style="display: flex; align-items: center; justify-content: space-between; padding: 20px; background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-decoration: none;">
-              <div style="display: flex; align-items: center;">
-                <div style="width: 56px; height: 56px; border-radius: 14px; background: #f97316; display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; margin-right: 16px;">
+            <a href="/manual" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-decoration: none;">
+              <div style="display: flex; align-items: center; flex: 1;">
+                <div style="width: 60px; height: 60px; border-radius: 16px; background: #f97316; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; margin-right: 15px; flex-shrink: 0;">
                   📖
                 </div>
-                <div>
-                  <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0;">対応マニュアル</h3>
-                  <p style="font-size: 13px; color: #6b7280; margin: 4px 0 0 0;">対応フレーズ集を確認</p>
+                <div style="flex: 1;">
+                  <h3 style="font-size: 17px; font-weight: 700; color: #1f2937; margin: 0 0 2px 0;">対応マニュアル</h3>
+                  <p style="font-size: 13px; color: #6b7280; margin: 0;">対応フレーズ集を確認</p>
                 </div>
               </div>
-              <span style="color: #9ca3af; font-size: 20px; margin-left: 16px;">›</span>
+              <svg style="width: 24px; height: 24px; color: #d1d5db; flex-shrink: 0; margin-left: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
             </a>
           </div>
 
-          <!-- 統計情報（4つのボックス横並び） -->
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 20px;">
-            <div style="text-align: center;">
-              <p style="font-size: 11px; color: #6b7280; margin: 0 0 4px 0;">本日の相談</p>
-              <p style="font-size: 24px; font-weight: 700; color: #111827; margin: 0;">12件</p>
-            </div>
-            <div style="text-align: center;">
-              <p style="font-size: 11px; color: #6b7280; margin: 0 0 4px 0;">対応中</p>
-              <p style="font-size: 24px; font-weight: 700; color: #111827; margin: 0;">3件</p>
-            </div>
-            <div style="text-align: center;">
-              <p style="font-size: 11px; color: #6b7280; margin: 0 0 4px 0;">未完了</p>
-              <p style="font-size: 24px; font-weight: 700; color: #111827; margin: 0;">8件</p>
-            </div>
-            <div style="text-align: center;">
-              <p style="font-size: 11px; color: #6b7280; margin: 0 0 4px 0;">平均時間</p>
-              <p style="font-size: 24px; font-weight: 700; color: #111827; margin: 0;">14分</p>
+          <!-- 統計情報（4つのボックス） -->
+          <div style="background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 20px 16px;">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;">
+              <div style="text-align: center; padding: 0 8px;">
+                <p style="font-size: 11px; color: #6b7280; margin: 0 0 6px 0; font-weight: 500;">本日の相談</p>
+                <p style="font-size: 26px; font-weight: 800; color: #1f2937; margin: 0; line-height: 1;">12件</p>
+              </div>
+              <div style="text-align: center; padding: 0 8px; border-left: 1px solid #e5e7eb;">
+                <p style="font-size: 11px; color: #6b7280; margin: 0 0 6px 0; font-weight: 500;">対応中</p>
+                <p style="font-size: 26px; font-weight: 800; color: #1f2937; margin: 0; line-height: 1;">3件</p>
+              </div>
+              <div style="text-align: center; padding: 0 8px; border-left: 1px solid #e5e7eb;">
+                <p style="font-size: 11px; color: #6b7280; margin: 0 0 6px 0; font-weight: 500;">未完了</p>
+                <p style="font-size: 26px; font-weight: 800; color: #1f2937; margin: 0; line-height: 1;">8件</p>
+              </div>
+              <div style="text-align: center; padding: 0 8px; border-left: 1px solid #e5e7eb;">
+                <p style="font-size: 11px; color: #6b7280; margin: 0 0 6px 0; font-weight: 500;">平均時間</p>
+                <p style="font-size: 26px; font-weight: 800; color: #1f2937; margin: 0; line-height: 1;">14分</p>
+              </div>
             </div>
           </div>
         </main>
 
         <!-- フッター -->
         <footer style="background: #1f2937; color: white; margin-top: 48px; padding: 24px 0;">
-          <div class="container mx-auto px-4" style="text-align: center;">
-            <p style="font-size: 14px;">© 2026 一般社団法人相模原ダルク - 電話対応支援システム</p>
-            <p style="font-size: 16px; font-weight: 600; margin-top: 12px;">人は必ずやり直せる--</p>
-            <p style="font-size: 14px; color: #93c5fd; font-weight: 500; margin-top: 8px;">--相模原ダルクの挑戦--</p>
+          <div style="max-width: 480px; margin: 0 auto; padding: 0 20px; text-align: center;">
+            <p style="font-size: 14px; margin: 0;">© 2026 一般社団法人相模原ダルク - 電話対応支援システム</p>
+            <p style="font-size: 16px; font-weight: 600; margin: 12px 0 0 0;">人は必ずやり直せる--</p>
+            <p style="font-size: 14px; color: #93c5fd; font-weight: 500; margin: 8px 0 0 0;">--相模原ダルクの挑戦--</p>
           </div>
         </footer>
     </body>

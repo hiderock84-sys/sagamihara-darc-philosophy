@@ -136,11 +136,11 @@ function showHomePage() {
                 <i class="fas fa-phone mr-1"></i>
                 TEL: 042-707-0391
               </p>
-              <p class="text-xs text-blue-200 mt-1 hidden md:block">
-                平日 9:00-17:00 / 土・祝 9:00-14:00
-              </p>
-              <p class="text-xs text-blue-200 mt-1 md:hidden">
+              <p class="text-xs text-blue-200 mt-1">
                 平日 9:00-17:00
+              </p>
+              <p class="text-xs text-blue-200">
+                土祝日 9:00-12:00
               </p>
             </div>
           </div>

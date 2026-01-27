@@ -127,7 +127,7 @@ function showHomePage() {
             <!-- 中央：タイトル（大きく） -->
             <div class="flex-1 text-center">
               <h1 class="text-3xl md:text-5xl font-bold">相模原ダルク</h1>
-              <p class="text-xs md:text-sm text-blue-100 mt-1">電話対応支援システム</p>
+              <p class="text-sm md:text-base text-blue-100 mt-1">電話対応支援システム</p>
             </div>
             
             <!-- 右側：電話番号 -->

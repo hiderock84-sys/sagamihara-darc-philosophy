@@ -9,6 +9,7 @@ let staffList = [];
 let phrasesByCategory = {};
 let consultations = [];
 let currentFilter = {};
+let deferredPrompt = null; // PWAインストールプロンプト
 
 // 依存症種類の定義
 const ADDICTION_TYPES = [
@@ -36,11 +37,88 @@ const PHASES = [
 ];
 
 // ==========================================
+// PWA機能
+// ==========================================
+
+// PWAインストールプロンプトをキャプチャ
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  console.log('📱 PWAインストール可能');
+  showInstallButton();
+});
+
+// インストールボタンを表示
+function showInstallButton() {
+  const installSection = document.getElementById('pwa-install-section');
+  if (installSection && deferredPrompt) {
+    installSection.style.display = 'block';
+  }
+}
+
+// PWAインストール実行
+async function installPWA() {
+  if (!deferredPrompt) {
+    alert('このアプリは既にインストールされているか、インストールできません。');
+    return;
+  }
+  
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  
+  if (outcome === 'accepted') {
+    console.log('✅ PWAインストール成功');
+    showSuccess('アプリをインストールしました！');
+  } else {
+    console.log('❌ PWAインストールキャンセル');
+  }
+  
+  deferredPrompt = null;
+}
+
+// オンライン/オフライン状態の監視
+window.addEventListener('online', () => {
+  console.log('✅ オンラインに復帰');
+  hideOfflineBanner();
+  showSuccess('インターネット接続が回復しました');
+});
+
+window.addEventListener('offline', () => {
+  console.log('⚠️ オフラインになりました');
+  showOfflineBanner();
+});
+
+// オフラインバナー表示
+function showOfflineBanner() {
+  let banner = document.getElementById('offline-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'offline-banner';
+    banner.className = 'offline-banner';
+    banner.innerHTML = '<i class="fas fa-wifi" style="margin-right: 8px;"></i>オフラインモードです';
+    document.body.prepend(banner);
+  }
+}
+
+// オフラインバナー非表示
+function hideOfflineBanner() {
+  const banner = document.getElementById('offline-banner');
+  if (banner) {
+    banner.remove();
+  }
+}
+
+// ==========================================
 // 初期化
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', async () => {
   await initApp();
+  
+  // 初期オフラインチェック
+  if (!navigator.onLine) {
+    showOfflineBanner();
+  }
 });
 
 async function initApp() {
@@ -269,6 +347,20 @@ async function showHomePage() {
           </div>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="flex-shrink: 0; margin-left: 16px;">
             <path d="M7 4L13 10L7 16" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- PWAインストールボタン（インストール可能な場合のみ表示） -->
+      <div id="pwa-install-section" style="display: none; margin-bottom: 20px;">
+        <div onclick="installPWA()" style="background: linear-gradient(135deg, #10b981, #059669); border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); cursor: pointer; display: flex; align-items: center; color: white;">
+          <div style="width: 60px; height: 60px; border-radius: 16px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0;">📲</div>
+          <div style="flex: 1; margin-left: 16px;">
+            <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: white;">アプリをインストール</h3>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: rgba(255,255,255,0.9);">ホーム画面に追加してすぐアクセス</p>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="flex-shrink: 0; margin-left: 16px;">
+            <path d="M10 3V13M10 13L6 9M10 13L14 9M3 17H17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
       </div>

@@ -14,6 +14,11 @@ app.use('/api/*', cors())
 // 静的ファイル配信
 app.use('/static/*', serveStatic({ root: './public' }))
 
+// PWA関連ファイル（ルートパス）
+app.get('/manifest.json', (c) => c.redirect('/static/manifest.json'))
+app.get('/sw.js', (c) => c.redirect('/static/sw.js'))
+app.get('/offline.html', (c) => c.redirect('/static/offline.html'))
+
 // ==========================================
 // API: スタッフ関連
 // ==========================================
@@ -299,9 +304,25 @@ app.get('/', (c) => {
     <html lang="ja">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+        
+        <!-- PWA対応 -->
+        <meta name="theme-color" content="#1e40af">
+        <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="相模原ダルク">
+        <link rel="manifest" href="/manifest.json">
+        
+        <!-- アイコン -->
+        <link rel="icon" type="image/png" sizes="192x192" href="/static/icon-192.png">
+        <link rel="icon" type="image/png" sizes="512x512" href="/static/icon-512.png">
+        <link rel="apple-touch-icon" href="/static/icon-192.png">
+        
+        <!-- SEO -->
+        <meta name="description" content="相模原ダルク 依存症相談電話対応支援システム - 電話相談の記録・管理・統計分析をサポート">
+        <meta name="keywords" content="相模原ダルク,依存症,電話相談,支援システム,ダルク">
+        
         <title>相模原ダルク 電話対応支援システム</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
@@ -348,7 +369,68 @@ app.get('/', (c) => {
               padding-right: 1rem;
             }
           }
+          
+          /* タブレット対応 */
+          @media (min-width: 641px) and (max-width: 1024px) {
+            #app {
+              max-width: 768px;
+              margin: 0 auto;
+            }
+          }
+          
+          /* PWA: セーフエリア対応 */
+          body {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+          }
+          
+          /* タッチ操作の改善 */
+          button, a, [onclick] {
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+          }
+          
+          /* スクロールの最適化 */
+          * {
+            -webkit-overflow-scrolling: touch;
+          }
         </style>
+        
+        <!-- Service Worker登録 -->
+        <script>
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+              navigator.serviceWorker.register('/sw.js')
+                .then((registration) => {
+                  console.log('✅ Service Worker登録成功:', registration.scope);
+                })
+                .catch((error) => {
+                  console.log('❌ Service Worker登録失敗:', error);
+                });
+            });
+          }
+          
+          // PWAインストールプロンプト
+          let deferredPrompt;
+          window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('📱 PWAインストール可能');
+            // インストールボタンを表示する処理をここに追加できます
+          });
+          
+          // オンライン/オフライン状態の検知
+          window.addEventListener('online', () => {
+            console.log('✅ オンラインに復帰');
+          });
+          
+          window.addEventListener('offline', () => {
+            console.log('⚠️ オフラインになりました');
+          });
+        </script>
     </head>
     <body style="background: #f5f5f5; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
         <div id="app"></div>

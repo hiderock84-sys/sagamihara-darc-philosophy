@@ -370,7 +370,7 @@ app.get('/', (c) => {
     </head>
     <body style="background: #f5f5f5; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
         <!-- ヘッダー -->
-        <header style="background: #2563eb; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <header style="background: #1e40af; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
           <div style="max-width: 480px; margin: 0 auto; padding: 16px 20px;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
               <!-- 左側：タイトル -->

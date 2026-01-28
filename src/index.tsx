@@ -370,18 +370,21 @@ app.get('/', (c) => {
     </head>
     <body style="background: #f5f5f5; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
         <!-- ヘッダー -->
-        <header style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <div style="max-width: 480px; margin: 0 auto; padding: 16px 20px 20px 20px;">
-            <!-- 電話番号（中央上部・小さく） -->
-            <div style="text-align: center; font-size: 10px; margin-bottom: 10px; opacity: 0.95;">
-              <p style="margin: 0; font-weight: 500;">TEL: 042-707-0391</p>
-              <p style="margin: 2px 0 0 0;">平日 9:00-17:00 / 土祝日 9:00-12:00</p>
-            </div>
-            
-            <!-- タイトル（中央・大きく） -->
-            <div style="text-align: center;">
-              <h1 style="font-size: 32px; font-weight: 800; margin: 0; line-height: 1.1; letter-spacing: -0.5px;">相模原ダルク</h1>
-              <p style="font-size: 15px; margin: 6px 0 0 0; font-weight: 500; opacity: 0.95;">電話対応支援システム</p>
+        <header style="background: #1d4ed8; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="max-width: 480px; margin: 0 auto; padding: 16px 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <!-- 左側：タイトル -->
+              <div>
+                <h1 style="font-size: 24px; font-weight: 700; margin: 0; line-height: 1.2;">相模原ダルク</h1>
+                <p style="font-size: 14px; margin: 4px 0 0 0; font-weight: 400; opacity: 0.95;">電話対応支援システム</p>
+              </div>
+              
+              <!-- 右側：電話番号 -->
+              <div style="text-align: right; font-size: 11px; line-height: 1.4;">
+                <p style="margin: 0; font-weight: 500;">TEL: 042-707-0391</p>
+                <p style="margin: 2px 0 0 0; opacity: 0.9;">平日 9:00-17:00</p>
+                <p style="margin: 0; opacity: 0.9;">土祝日 9:00-12:00</p>
+              </div>
             </div>
           </div>
         </header>

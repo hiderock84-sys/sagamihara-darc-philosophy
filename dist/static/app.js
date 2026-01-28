@@ -604,8 +604,9 @@ function renderConsultationsList(consultations) {
   }
   
   return consultations.map(consultation => {
-    const urgencyColor = consultation.urgency_level === '高' ? '#ef4444' : consultation.urgency_level === '中' ? '#f59e0b' : '#10b981';
-    const date = new Date(consultation.created_at);
+    const urgencyLevel = consultation.emergency_level || '中';
+    const urgencyColor = urgencyLevel === '高' ? '#ef4444' : urgencyLevel === '中' ? '#f59e0b' : '#10b981';
+    const date = new Date(consultation.created_at || consultation.reception_datetime);
     const dateStr = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
     
     return `
@@ -615,14 +616,12 @@ function renderConsultationsList(consultations) {
             <h4 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 700; color: #1f2937;">${consultation.caller_name || '（氏名なし）'}</h4>
             <p style="margin: 0; font-size: 13px; color: #6b7280;">${dateStr}</p>
           </div>
-          <span style="background: ${urgencyColor}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">${consultation.urgency_level}</span>
+          <span style="background: ${urgencyColor}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">${urgencyLevel}</span>
         </div>
         
         <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
-          <span style="background: #dbeafe; color: #1e40af; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;">${consultation.addiction_type}</span>
-          <span style="background: #f3f4f6; color: #6b7280; padding: 4px 10px; border-radius: 8px; font-size: 12px;">${consultation.caller_relationship}</span>
-          ${consultation.target_age ? `<span style="background: #f3f4f6; color: #6b7280; padding: 4px 10px; border-radius: 8px; font-size: 12px;">${consultation.target_age}歳</span>` : ''}
-          ${consultation.target_gender ? `<span style="background: #f3f4f6; color: #6b7280; padding: 4px 10px; border-radius: 8px; font-size: 12px;">${consultation.target_gender}</span>` : ''}
+          <span style="background: #dbeafe; color: #1e40af; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;">${consultation.addiction_types || '未分類'}</span>
+          <span style="background: #f3f4f6; color: #6b7280; padding: 4px 10px; border-radius: 8px; font-size: 12px;">${consultation.caller_relationship || '不明'}</span>
         </div>
         
         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -677,15 +676,17 @@ async function showConsultationDetail(id) {
   try {
     const response = await fetch(`${API_BASE}/consultations/${id}`);
     if (!response.ok) throw new Error('詳細取得失敗');
-    const consultation = await response.json();
+    const data = await response.json();
+    const consultation = data.consultation || data;
     
-    const date = new Date(consultation.created_at);
+    const date = new Date(consultation.created_at || consultation.reception_datetime);
     const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-    const urgencyColor = consultation.urgency_level === '高' ? '#ef4444' : consultation.urgency_level === '中' ? '#f59e0b' : '#10b981';
+    const urgencyLevel = consultation.emergency_level || '中';
+    const urgencyColor = urgencyLevel === '高' ? '#ef4444' : urgencyLevel === '中' ? '#f59e0b' : '#10b981';
     
     let phases = {};
     try {
-      phases = JSON.parse(consultation.phases || '{}');
+      phases = JSON.parse(consultation.consultation_content || '{}');
     } catch (e) {
       console.error('フェーズパースエラー:', e);
     }
@@ -702,7 +703,7 @@ async function showConsultationDetail(id) {
               <h3 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700; color: #1f2937;">${consultation.caller_name || '（氏名なし）'}</h3>
               <p style="margin: 0; font-size: 13px; color: #6b7280;">${dateStr}</p>
             </div>
-            <span style="background: ${urgencyColor}; color: white; padding: 6px 14px; border-radius: 12px; font-size: 13px; font-weight: 600;">${consultation.urgency_level}</span>
+            <span style="background: ${urgencyColor}; color: white; padding: 6px 14px; border-radius: 12px; font-size: 13px; font-weight: 600;">${urgencyLevel}</span>
           </div>
           
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
@@ -712,11 +713,11 @@ async function showConsultationDetail(id) {
             </div>
             <div>
               <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">関係</p>
-              <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.caller_relationship}</p>
+              <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.caller_relationship || '不明'}</p>
             </div>
             <div>
               <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">依存症</p>
-              <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.addiction_type}</p>
+              <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.addiction_types || '未分類'}</p>
             </div>
             <div>
               <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">対応スタッフ</p>
@@ -725,28 +726,11 @@ async function showConsultationDetail(id) {
           </div>
         </div>
         
-        <!-- 対象者情報 -->
-        ${consultation.target_name ? `
+        <!-- メモ -->
+        ${consultation.notes ? `
           <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-            <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 700; color: #1f2937; border-bottom: 2px solid #10b981; padding-bottom: 6px;">対象者情報</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
-              <div>
-                <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">氏名</p>
-                <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.target_name}</p>
-              </div>
-              ${consultation.target_age ? `
-                <div>
-                  <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">年齢</p>
-                  <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.target_age}歳</p>
-                </div>
-              ` : ''}
-              ${consultation.target_gender ? `
-                <div>
-                  <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">性別</p>
-                  <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.target_gender}</p>
-                </div>
-              ` : ''}
-            </div>
+            <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 700; color: #1f2937; border-bottom: 2px solid #10b981; padding-bottom: 6px;">メモ</h3>
+            <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6; white-space: pre-wrap;">${consultation.notes}</p>
           </div>
         ` : ''}
         

@@ -52,51 +52,33 @@ app.get('/api/phrases', async (c) => {
 // API: 相談記録関連
 // ==========================================
 
-// 相談記録作成
+// 相談記録作成（新フォーマット対応）
 app.post('/api/consultations', async (c) => {
   const { DB } = c.env
   const data = await c.req.json()
   
   try {
+    // スタッフIDからスタッフ名を取得
+    const staffResult = await DB.prepare('SELECT name FROM staff WHERE id = ?').bind(data.staff_id).first()
+    const staffName = staffResult ? staffResult.name : 'Unknown'
+    
     const result = await DB.prepare(`
       INSERT INTO consultations (
-        reception_datetime, staff_name, caller_name, caller_age, caller_gender,
-        caller_phone, caller_relationship, caller_relationship_detail,
-        addiction_types, addiction_period, addiction_frequency, addiction_severity,
-        hospitalization_history, hospitalization_facility,
-        outpatient_history, outpatient_facility,
-        medication_status, medication_name,
-        other_facility_use, other_facility_name,
-        emergency_use_24h, emergency_withdrawal, emergency_self_harm, emergency_medical_needed,
-        emergency_level, consultation_content, notes,
-        interview_scheduled, interview_datetime,
-        followup_scheduled, followup_datetime,
-        coordination_needed, report_completed, report_to,
-        check_name_contact, check_addiction_type, check_emergency_level,
-        check_next_action, check_followup_date, check_record_completed
-      ) VALUES (
-        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?, ?, ?, ?
-      )
+        reception_datetime, staff_name, 
+        caller_name, caller_phone, caller_relationship,
+        addiction_types, emergency_level, 
+        consultation_content, notes
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
-      data.reception_datetime, data.staff_name, data.caller_name, data.caller_age, data.caller_gender,
-      data.caller_phone, data.caller_relationship, data.caller_relationship_detail,
-      data.addiction_types, data.addiction_period, data.addiction_frequency, data.addiction_severity,
-      data.hospitalization_history, data.hospitalization_facility,
-      data.outpatient_history, data.outpatient_facility,
-      data.medication_status, data.medication_name,
-      data.other_facility_use, data.other_facility_name,
-      data.emergency_use_24h ? 1 : 0, data.emergency_withdrawal ? 1 : 0, 
-      data.emergency_self_harm ? 1 : 0, data.emergency_medical_needed ? 1 : 0,
-      data.emergency_level, data.consultation_content, data.notes,
-      data.interview_scheduled ? 1 : 0, data.interview_datetime,
-      data.followup_scheduled ? 1 : 0, data.followup_datetime,
-      data.coordination_needed, data.report_completed ? 1 : 0, data.report_to,
-      data.check_name_contact ? 1 : 0, data.check_addiction_type ? 1 : 0, 
-      data.check_emergency_level ? 1 : 0,
-      data.check_next_action ? 1 : 0, data.check_followup_date ? 1 : 0, 
-      data.check_record_completed ? 1 : 0
+      new Date().toISOString(),
+      staffName,
+      data.caller_name || '',
+      data.caller_phone || '',
+      data.caller_relationship || '',
+      data.addiction_type || '',
+      data.urgency_level || '中',
+      data.phases || '{}',
+      data.target_name ? `対象者: ${data.target_name}` : ''
     ).run()
     
     return c.json({ 

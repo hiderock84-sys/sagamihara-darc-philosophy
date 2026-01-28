@@ -67,7 +67,8 @@ async function loadStaffList() {
   try {
     const response = await fetch(`${API_BASE}/staff`);
     if (!response.ok) throw new Error('スタッフリスト取得失敗');
-    staffList = await response.json();
+    const data = await response.json();
+    staffList = data.staff || [];
   } catch (error) {
     console.error('スタッフリスト取得エラー:', error);
     showError('スタッフリストの読み込みに失敗しました');
@@ -78,7 +79,8 @@ async function loadPhrases() {
   try {
     const response = await fetch(`${API_BASE}/phrases`);
     if (!response.ok) throw new Error('フレーズ取得失敗');
-    const phrases = await response.json();
+    const data = await response.json();
+    const phrases = data.phrases || [];
     
     // カテゴリ別にグループ化
     phrasesByCategory = {};

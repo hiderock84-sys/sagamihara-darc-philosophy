@@ -13,7 +13,6 @@ app.use('/api/*', cors())
 
 // 静的ファイル配信
 app.use('/static/*', serveStatic({ root: './public' }))
-app.use('/*', serveStatic({ root: './public' })) // PWAファイル用
 
 // ==========================================
 // API: スタッフ関連
@@ -289,6 +288,14 @@ app.get('/api/stats/dashboard', async (c) => {
     recentConsultations: recentConsultations.results
   })
 })
+
+// ==========================================
+// PWAファイル配信
+// ==========================================
+
+app.get('/manifest.json', serveStatic({ path: './public/manifest.json' }))
+app.get('/sw.js', serveStatic({ path: './public/sw.js' }))
+app.get('/offline.html', serveStatic({ path: './public/offline.html' }))
 
 // ==========================================
 // フロントエンド（ルートページ）

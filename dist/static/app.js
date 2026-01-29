@@ -11,6 +11,10 @@ let consultations = [];
 let currentFilter = {};
 let deferredPrompt = null; // PWAインストールプロンプト
 
+// ページ履歴管理（スワイプナビゲーション用）
+let pageHistory = ['home'];
+let historyIndex = 0;
+
 // 依存症種類の定義
 const ADDICTION_TYPES = [
   'アルコール依存',
@@ -241,9 +245,13 @@ async function saveConsultation(data) {
 // ==========================================
 
 function renderHeader(title = 'ホーム', showBack = false) {
+  // PWAモード判定（standalone表示モード）
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const topPadding = isPWA ? '50px' : '16px'; // PWA時は上部に1cm（約38px≒50px）追加
+  
   return `
     <header style="background: #1e40af; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-      <div style="max-width: 480px; margin: 0 auto; padding: 16px 20px;">
+      <div style="max-width: 480px; margin: 0 auto; padding: ${topPadding} 20px 16px 20px;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
           ${!showBack ? `
             <!-- ホーム画面：左側タイトル、右側電話番号 -->
@@ -258,7 +266,7 @@ function renderHeader(title = 'ホーム', showBack = false) {
             </div>
           ` : `
             <!-- サブ画面：戻るボタン + タイトル -->
-            <button onclick="showHomePage()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0; margin-right: 12px;">←</button>
+            <button onclick="goBack()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0; margin-right: 12px;">←</button>
             <div style="flex: 1;">
               <h1 style="font-size: 22px; font-weight: 700; margin: 0; line-height: 1.3;">${title}</h1>
             </div>
@@ -303,7 +311,7 @@ async function showHomePage() {
       <!-- 機能メニュー -->
       <div style="margin-bottom: 20px;">
         <!-- 新規相談受付 -->
-        <div onclick="showNewConsultation()" style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; display: flex; align-items: center;">
+        <div onclick="navigateToPage('new-consultation')" style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; display: flex; align-items: center;">
           <div style="width: 60px; height: 60px; border-radius: 16px; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0;">📞</div>
           <div style="flex: 1; margin-left: 16px;">
             <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #1f2937;">新規相談受付</h3>
@@ -315,7 +323,7 @@ async function showHomePage() {
         </div>
         
         <!-- 相談履歴 -->
-        <div onclick="showHistory()" style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; display: flex; align-items: center;">
+        <div onclick="navigateToPage('history')" style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; display: flex; align-items: center;">
           <div style="width: 60px; height: 60px; border-radius: 16px; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0;">🕐</div>
           <div style="flex: 1; margin-left: 16px;">
             <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #1f2937;">相談履歴</h3>
@@ -327,7 +335,7 @@ async function showHomePage() {
         </div>
         
         <!-- 統計情報 -->
-        <div onclick="showStatistics()" style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; display: flex; align-items: center;">
+        <div onclick="navigateToPage('stats')" style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; display: flex; align-items: center;">
           <div style="width: 60px; height: 60px; border-radius: 16px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0;">📊</div>
           <div style="flex: 1; margin-left: 16px;">
             <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #1f2937;">統計情報</h3>
@@ -339,7 +347,7 @@ async function showHomePage() {
         </div>
         
         <!-- 対応マニュアル -->
-        <div onclick="showManual()" style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; display: flex; align-items: center;">
+        <div onclick="navigateToPage('manual')" style="background: white; border-radius: 20px; padding: 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; display: flex; align-items: center;">
           <div style="width: 60px; height: 60px; border-radius: 16px; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0;">📖</div>
           <div style="flex: 1; margin-left: 16px;">
             <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #1f2937;">対応マニュアル</h3>
@@ -1182,3 +1190,105 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+// ==========================================
+// ナビゲーション履歴管理
+// ==========================================
+
+function addToHistory(page) {
+  // 現在の位置から後ろの履歴を削除
+  pageHistory = pageHistory.slice(0, historyIndex + 1);
+  // 新しいページを追加
+  pageHistory.push(page);
+  historyIndex = pageHistory.length - 1;
+  console.log('📚 履歴追加:', page, 'index:', historyIndex, 'history:', pageHistory);
+}
+
+function goBack() {
+  if (historyIndex > 0) {
+    historyIndex--;
+    const previousPage = pageHistory[historyIndex];
+    console.log('⬅️ 戻る:', previousPage, 'index:', historyIndex);
+    navigateToPage(previousPage, false); // 履歴に追加しない
+  } else {
+    console.log('⬅️ これ以上戻れません');
+    showHomePage();
+  }
+}
+
+function goForward() {
+  if (historyIndex < pageHistory.length - 1) {
+    historyIndex++;
+    const nextPage = pageHistory[historyIndex];
+    console.log('➡️ 進む:', nextPage, 'index:', historyIndex);
+    navigateToPage(nextPage, false); // 履歴に追加しない
+  } else {
+    console.log('➡️ これ以上進めません');
+  }
+}
+
+function navigateToPage(page, addHistory = true) {
+  if (addHistory) {
+    addToHistory(page);
+  }
+  
+  switch(page) {
+    case 'home':
+      showHomePage();
+      break;
+    case 'new-consultation':
+      showNewConsultation();
+      break;
+    case 'history':
+      showHistory();
+      break;
+    case 'stats':
+      showStats();
+      break;
+    case 'manual':
+      showManual();
+      break;
+    default:
+      showHomePage();
+  }
+}
+
+// ==========================================
+// スワイプジェスチャー検出
+// ==========================================
+
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+
+function handleSwipe() {
+  const deltaX = touchEndX - touchStartX;
+  const deltaY = touchEndY - touchStartY;
+  const minSwipeDistance = 50; // 最小スワイプ距離（px）
+  
+  // 横スワイプの方が縦スワイプより大きい場合のみ処理
+  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+    if (deltaX > 0) {
+      // 右スワイプ = 戻る
+      console.log('👉 右スワイプ検出: 戻る');
+      goBack();
+    } else {
+      // 左スワイプ = 進む
+      console.log('👈 左スワイプ検出: 進む');
+      goForward();
+    }
+  }
+}
+
+// タッチイベントリスナー設定
+document.addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+  touchStartY = e.changedTouches[0].screenY;
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+  touchEndX = e.changedTouches[0].screenX;
+  touchEndY = e.changedTouches[0].screenY;
+  handleSwipe();
+}, { passive: true });

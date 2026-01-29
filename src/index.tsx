@@ -13,11 +13,7 @@ app.use('/api/*', cors())
 
 // 静的ファイル配信
 app.use('/static/*', serveStatic({ root: './public' }))
-
-// PWA関連ファイル（ルートパス）
-app.get('/manifest.json', (c) => c.redirect('/static/manifest.json'))
-app.get('/sw.js', (c) => c.redirect('/static/sw.js'))
-app.get('/offline.html', (c) => c.redirect('/static/offline.html'))
+app.use('/*', serveStatic({ root: './public' })) // PWAファイル用
 
 // ==========================================
 // API: スタッフ関連

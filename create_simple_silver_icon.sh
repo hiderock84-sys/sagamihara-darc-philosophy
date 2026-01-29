@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# 最終版：スカイブルー背景 + 白い電話 + 白いDARC
-# シンプルで見やすいデザイン
+# シンプル＆シルバー版PWAアイコン作成
+# ライトブルー透明背景 + シルバー電話 + シルバーDARC
 
 cd /home/user/webapp
 
@@ -10,24 +10,22 @@ cp public/static/icon-192.png public/static/icon-192-old.png 2>/dev/null || true
 cp public/static/icon-512.png public/static/icon-512-old.png 2>/dev/null || true
 
 # 512x512版
-# 背景: #87CEEB（スカイブルー）
-# 電話: 元画像の白いまま使用
-# DARC: 白（#FFFFFF）
-
 convert -size 512x512 \
   xc:"#87CEEB" \
   \( public/static/ai-generated-icon.png \
      -gravity center \
      -crop 50%x40%+0-60 +repage \
-     -resize 260x260 \
-  \) -gravity north -geometry +0+50 -composite \
+     -colorspace Gray \
+     -fill "#C0C0C0" -colorize 60% \
+     -resize 240x240 \
+  \) -gravity north -geometry +0+60 -composite \
   -font DejaVu-Sans-Bold \
-  -pointsize 150 \
-  -fill white \
-  -stroke "#B0B0B0" \
-  -strokewidth 2 \
+  -pointsize 140 \
+  -fill "#C0C0C0" \
+  -stroke "#909090" \
+  -strokewidth 3 \
   -gravity south \
-  -annotate +0+20 "DARC" \
+  -annotate +0+30 "DARC" \
   public/static/icon-512.png
 
 # 192x192版（512版を縮小）
@@ -35,7 +33,7 @@ convert public/static/icon-512.png \
   -resize 192x192 \
   public/static/icon-192.png
 
-echo "✅ 最終版PWAアイコン作成完了！（スカイブルー + 白）"
+echo "✅ シンプル＆シルバー版PWAアイコン作成完了！"
 ls -lh public/static/icon-*.png
 
 # ファイル確認

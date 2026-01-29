@@ -247,7 +247,7 @@ async function saveConsultation(data) {
 function renderHeader(title = 'ホーム', showBack = false) {
   // PWAモード判定（standalone表示モード）
   const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-  const topPadding = isPWA ? '50px' : '16px'; // PWA時は上部に1cm（約38px≒50px）追加
+  const topPadding = isPWA ? '88px' : '16px'; // PWA時は上部に2cm（約76px≒88px）追加
   
   return `
     <header style="background: #1e40af; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
@@ -1243,7 +1243,7 @@ function navigateToPage(page, addHistory = true) {
       showHistory();
       break;
     case 'stats':
-      showStats();
+      showStatistics();
       break;
     case 'manual':
       showManual();

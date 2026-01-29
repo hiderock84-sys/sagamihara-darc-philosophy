@@ -416,14 +416,7 @@ app.get('/', (c) => {
             });
           }
           
-          // PWAインストールプロンプト
-          let deferredPrompt;
-          window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            console.log('📱 PWAインストール可能');
-            // インストールボタンを表示する処理をここに追加できます
-          });
+          // PWAインストールプロンプト（app.jsで処理）
           
           // オンライン/オフライン状態の検知
           window.addEventListener('online', () => {

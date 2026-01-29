@@ -242,7 +242,7 @@ async function saveConsultation(data) {
 
 function renderHeader(title = 'ホーム', showBack = false) {
   return `
-    <header style="background: #1e40af; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <header style="background: #1e40af; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-height: 160px;">
       <div style="max-width: 480px; margin: 0 auto; padding: 32px 40px;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
           ${!showBack ? `

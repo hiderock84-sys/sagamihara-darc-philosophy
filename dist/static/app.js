@@ -365,44 +365,29 @@ async function showHomePage() {
         </div>
       </div>
       
-      <!-- 管理・マニュアル -->
-      <div style="margin-bottom: 20px;">
-        <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 700; color: #6b7280;">📚 管理・マニュアル</h3>
+      <!-- 管理・マニュアル（フッター拡大版・横並び） -->
+      <div style="margin-bottom: 20px; padding: 32px 20px; background: #f8fafc; border-radius: 20px; border-top: 4px solid #1e40af;">
+        <h3 style="margin: 0 0 24px 0; font-size: 20px; font-weight: 700; color: #1e40af; text-align: center;">📚 管理・マニュアル</h3>
         
-        <!-- スタッフ管理マニュアル -->
-        <div onclick="window.open('https://github.com/hiderock84-sys/sagamihara-darc-philosophy/blob/main/STAFF_MANAGEMENT.md', '_blank')" style="background: white; border-radius: 16px; padding: 16px 20px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); cursor: pointer; display: flex; align-items: center;">
-          <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #06b6d4, #0891b2); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">👥</div>
-          <div style="flex: 1; margin-left: 14px;">
-            <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: #1f2937;">スタッフ管理マニュアル</h4>
-            <p style="margin: 2px 0 0 0; font-size: 13px; color: #6b7280;">スタッフの追加・管理方法</p>
+        <!-- 横並びコンテナ -->
+        <div style="display: flex; gap: 16px; justify-content: space-between;">
+          <!-- スタッフ管理マニュアル -->
+          <div onclick="window.open('https://github.com/hiderock84-sys/sagamihara-darc-philosophy/blob/main/STAFF_MANAGEMENT.md', '_blank')" style="flex: 1; background: white; border-radius: 16px; padding: 20px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; transition: transform 0.2s, box-shadow 0.2s;">
+            <div style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #06b6d4, #0891b2); display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 12px;">👥</div>
+            <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #1f2937; line-height: 1.4;">スタッフ<br/>管理マニュアル</h4>
           </div>
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style="flex-shrink: 0; margin-left: 12px;">
-            <path d="M11 3L17 3L17 9M17 3L9 11" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        
-        <!-- プロジェクトREADME -->
-        <div onclick="window.open('https://github.com/hiderock84-sys/sagamihara-darc-philosophy/blob/main/README.md', '_blank')" style="background: white; border-radius: 16px; padding: 16px 20px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); cursor: pointer; display: flex; align-items: center;">
-          <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #ec4899, #db2777); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">📄</div>
-          <div style="flex: 1; margin-left: 14px;">
-            <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: #1f2937;">プロジェクト説明書</h4>
-            <p style="margin: 2px 0 0 0; font-size: 13px; color: #6b7280;">システム概要と使い方</p>
+          
+          <!-- プロジェクトREADME -->
+          <div onclick="window.open('https://github.com/hiderock84-sys/sagamihara-darc-philosophy/blob/main/README.md', '_blank')" style="flex: 1; background: white; border-radius: 16px; padding: 20px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; transition: transform 0.2s, box-shadow 0.2s;">
+            <div style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #ec4899, #db2777); display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 12px;">📄</div>
+            <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #1f2937; line-height: 1.4;">プロジェクト<br/>説明書</h4>
           </div>
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style="flex-shrink: 0; margin-left: 12px;">
-            <path d="M11 3L17 3L17 9M17 3L9 11" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        
-        <!-- GitHubリポジトリ -->
-        <div onclick="window.open('https://github.com/hiderock84-sys/sagamihara-darc-philosophy', '_blank')" style="background: white; border-radius: 16px; padding: 16px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); cursor: pointer; display: flex; align-items: center;">
-          <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #4f46e5); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">💻</div>
-          <div style="flex: 1; margin-left: 14px;">
-            <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: #1f2937;">GitHubリポジトリ</h4>
-            <p style="margin: 2px 0 0 0; font-size: 13px; color: #6b7280;">ソースコードと全ドキュメント</p>
+          
+          <!-- GitHubリポジトリ -->
+          <div onclick="window.open('https://github.com/hiderock84-sys/sagamihara-darc-philosophy', '_blank')" style="flex: 1; background: white; border-radius: 16px; padding: 20px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; transition: transform 0.2s, box-shadow 0.2s;">
+            <div style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #6366f1, #4f46e5); display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 12px;">💻</div>
+            <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #1f2937; line-height: 1.4;">GitHub<br/>リポジトリ</h4>
           </div>
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style="flex-shrink: 0; margin-left: 12px;">
-            <path d="M11 3L17 3L17 9M17 3L9 11" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
         </div>
       </div>
       

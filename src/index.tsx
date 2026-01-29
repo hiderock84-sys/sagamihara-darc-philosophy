@@ -290,12 +290,12 @@ app.get('/api/stats/dashboard', async (c) => {
 })
 
 // ==========================================
-// PWAファイル配信
+// PWAファイル配信（静的ファイルとして配信）
 // ==========================================
 
-app.get('/manifest.json', serveStatic({ path: './public/manifest.json' }))
-app.get('/sw.js', serveStatic({ path: './public/sw.js' }))
-app.get('/offline.html', serveStatic({ path: './public/offline.html' }))
+app.get('/manifest.json', serveStatic({ root: './public' }))
+app.get('/sw.js', serveStatic({ root: './public' }))
+app.get('/offline.html', serveStatic({ root: './public' }))
 
 // ==========================================
 // フロントエンド（ルートページ）

@@ -241,9 +241,13 @@ async function saveConsultation(data) {
 // ==========================================
 
 function renderHeader(title = 'ホーム', showBack = false) {
+  // PWAモード判定（standalone表示モード）
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const topPadding = isPWA ? '50px' : '16px'; // PWA時は上部に1cm（約38px≒50px）追加
+  
   return `
     <header style="background: #1e40af; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-      <div style="max-width: 480px; margin: 0 auto; padding: 16px 20px;">
+      <div style="max-width: 480px; margin: 0 auto; padding: ${topPadding} 20px 16px 20px;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
           ${!showBack ? `
             <!-- ホーム画面：左側タイトル、右側電話番号 -->
@@ -258,7 +262,7 @@ function renderHeader(title = 'ホーム', showBack = false) {
             </div>
           ` : `
             <!-- サブ画面：戻るボタン + タイトル -->
-            <button onclick="showHomePage()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0; margin-right: 12px;">←</button>
+            <button onclick="goBack()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0; margin-right: 12px;">←</button>
             <div style="flex: 1;">
               <h1 style="font-size: 22px; font-weight: 700; margin: 0; line-height: 1.3;">${title}</h1>
             </div>
@@ -1061,7 +1065,26 @@ async function showManual() {
 function renderManualPhrases(category, searchTerm) {
   let html = '';
   
-  const categoriesToShow = category ? [category] : Object.keys(phrasesByCategory);
+  // カテゴリ表示順序を定義（オープニング系を最初に）
+  const categoryOrder = [
+    'オープニング',
+    '挨拶・確認',
+    '傾聴・共感',
+    '状況確認',
+    '施設説明',
+    '次のステップ',
+    '家族向け',
+    '緊急対応',
+    '医療連携',
+    'クロージング'
+  ];
+  
+  // カテゴリをソート（定義順 → 存在するカテゴリのみ表示）
+  const allCategories = Object.keys(phrasesByCategory);
+  const sortedCategories = categoryOrder.filter(cat => allCategories.includes(cat))
+    .concat(allCategories.filter(cat => !categoryOrder.includes(cat)));
+  
+  const categoriesToShow = category ? [category] : sortedCategories;
   
   categoriesToShow.forEach(cat => {
     const phases = phrasesByCategory[cat];

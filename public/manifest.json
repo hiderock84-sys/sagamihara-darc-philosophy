@@ -1,6 +1,6 @@
 {
-  "name": "相模原ダルク",
-  "short_name": "相模原ダルク",
+  "name": "Call Mgmt",
+  "short_name": "Call Mgmt",
   "description": "依存症相談電話対応支援システム - 相談記録・統計・マニュアル管理",
   "start_url": "/",
   "display": "standalone",

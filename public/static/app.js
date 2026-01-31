@@ -285,9 +285,9 @@ function renderFooter() {
   return `
     <footer style="background: #1f2937; color: white; margin-top: 24px; padding: 32px 0;">
       <div style="max-width: 480px; margin: 0 auto; padding: 0 20px; text-align: center;">
-        <p style="font-size: 10px; margin: 0; line-height: 1.6;">© 2026 一般社団法人相模原ダルク</p>
-        <p style="font-size: 14px; font-weight: 600; margin: 12px 0 0 0; line-height: 1.4;">人は必ずやり直せる</p>
-        <p style="font-size: 10px; color: #93c5fd; font-weight: 500; margin: 8px 0 0 0; line-height: 1.6;">相模原ダルクの挑戦</p>
+        <p style="font-size: 20px; margin: 0; line-height: 1.6;">© 2026 一般社団法人相模原ダルク - 電話対応支援システム</p>
+        <p style="font-size: 17px; font-weight: 600; margin: 12px 0 0 0; line-height: 1.4;">人は必ずやり直せる--</p>
+        <p style="font-size: 17px; color: #93c5fd; font-weight: 500; margin: 8px 0 0 0; line-height: 1.6;">--相模原ダルクの挑戦--</p>
       </div>
     </footer>
   `;

@@ -314,7 +314,7 @@ app.get('/', (c) => {
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="apple-mobile-web-app-title" content="相模原ダルク">
+        <meta name="apple-mobile-web-app-title" content="Call Mgmt">
         <link rel="manifest" href="/manifest.json">
         
         <!-- アイコン -->
@@ -323,10 +323,10 @@ app.get('/', (c) => {
         <link rel="apple-touch-icon" href="/static/icon-192.png">
         
         <!-- SEO -->
-        <meta name="description" content="相模原ダルク 依存症相談電話対応支援システム - 電話相談の記録・管理・統計分析をサポート">
-        <meta name="keywords" content="相模原ダルク,依存症,電話相談,支援システム,ダルク">
+        <meta name="description" content="Call Mgmt - 依存症相談電話対応支援システム - 電話相談の記録・管理・統計分析をサポート">
+        <meta name="keywords" content="Call Mgmt,依存症,電話相談,支援システム,ダルク">
         
-        <title>相模原ダルク 電話対応支援システム</title>
+        <title>Call Mgmt - 電話対応支援システム</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>

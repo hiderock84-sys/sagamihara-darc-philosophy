@@ -1059,16 +1059,16 @@ async function showManual() {
       <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
         <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 700; color: #1f2937;">カテゴリフィルター</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-          <button onclick="filterManualByCategory(null)" style="padding: 8px 16px; background: white; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">すべて</button>
+          <button onclick="filterManualByCategory(null)" style="padding: 8px 16px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">すべて</button>
           ${Object.keys(phrasesByCategory).map(category => `
-            <button onclick="filterManualByCategory('${category}')" style="padding: 8px 16px; background: ${category === 'opening' ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : 'white'}; color: ${category === 'opening' ? 'white' : '#3b82f6'}; border: ${category === 'opening' ? 'none' : '2px solid #3b82f6'}; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">${category}</button>
+            <button onclick="filterManualByCategory('${category}')" style="padding: 8px 16px; background: white; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">${category}</button>
           `).join('')}
         </div>
       </div>
       
       <!-- フレーズリスト -->
       <div id="manual-phrases-list">
-        ${renderManualPhrases('opening', null)}
+        ${renderManualPhrases(null, null)}
       </div>
     </main>
     

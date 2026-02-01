@@ -15,7 +15,7 @@ INSERT INTO staff (name, role, is_active) VALUES
 -- オープニング（第1段階）
 INSERT INTO response_phrases (category, phase, situation, phrase_type, phrase_text, sort_order) VALUES
   ('opening', '第1段階', 'オープニング文言', 'OK例', 'お電話ありがとうございます。相模原ダルクの〇〇と申します。本日はどのようなご相談でしょうか？', 1),
-  ('opening', '第1段階', 'オープニング文言', 'NG例', '名前を名乗らず「もしもし」とだけ答える', 2),
+  ('opening', '第1段階', 'オープニング文言', 'NG例', 'もしもし。', 2),
   ('opening', '第1段階', 'オープニング文言', 'ルール', '必ず名前を名乗り、相手の話を聞く姿勢を示す', 3);
 
 -- 傾聴・共感（第2段階）
@@ -23,8 +23,8 @@ INSERT INTO response_phrases (category, phase, situation, phrase_type, phrase_te
   ('listening', '第2段階', '傾聴の基本', 'ルール', '相手の話を遮らず、最後まで聞く', 1),
   ('listening', '第2段階', '傾聴の基本', 'OK例', 'そうだったんですね。それはとてもお辛い状況だったと思います。', 2),
   ('listening', '第2段階', '傾聴の基本', 'OK例', 'よくお話しくださいました。勇気を出して電話していただき、ありがとうございます。', 3),
-  ('listening', '第2段階', '傾聴の基本', 'NG例', '相手の話を途中で遮って「でも、それは違います」と否定する', 4),
-  ('listening', '第2段階', '傾聴の基本', 'NG例', '「私の方がもっと大変でした」と自分の話にすり替える', 5);
+  ('listening', '第2段階', '傾聴の基本', 'NG例', 'でも、それは違いますよ。', 4),
+  ('listening', '第2段階', '傾聴の基本', 'NG例', '私の方がもっと大変でしたから。', 5);
 
 -- 情報提供（第3段階）
 INSERT INTO response_phrases (category, phase, situation, phrase_type, phrase_text, sort_order) VALUES

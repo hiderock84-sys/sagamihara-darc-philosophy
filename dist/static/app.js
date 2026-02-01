@@ -625,6 +625,11 @@ function addPhraseToPhase(phase, phraseId) {
 }
 
 async function saveConsultationData() {
+  // 二重クリック防止
+  if (window.isSaving) {
+    return;
+  }
+  
   // バリデーション
   if (!currentConsultation.caller_name) {
     showError('相談者氏名を入力してください');
@@ -642,6 +647,9 @@ async function saveConsultationData() {
   }
   
   try {
+    // 保存中フラグを立てる
+    window.isSaving = true;
+    
     // データ整形
     const dataToSave = {
       ...currentConsultation,
@@ -658,12 +666,14 @@ async function saveConsultationData() {
     
     // 2秒後にホーム画面へ
     setTimeout(() => {
+      window.isSaving = false;
       showHomePage();
     }, 2000);
     
   } catch (error) {
     console.error('保存エラー:', error);
     showError('保存に失敗しました');
+    window.isSaving = false;
   }
 }
 

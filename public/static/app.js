@@ -1059,16 +1059,16 @@ async function showManual() {
       <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
         <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 700; color: #1f2937;">カテゴリフィルター</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-          <button onclick="filterManualByCategory(null)" style="padding: 8px 16px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">すべて</button>
+          <button onclick="filterManualByCategory(null)" style="padding: 8px 16px; background: white; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">すべて</button>
           ${Object.keys(phrasesByCategory).map(category => `
-            <button onclick="filterManualByCategory('${category}')" style="padding: 8px 16px; background: white; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">${category}</button>
+            <button onclick="filterManualByCategory('${category}')" style="padding: 8px 16px; background: ${category === 'opening' ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : 'white'}; color: ${category === 'opening' ? 'white' : '#3b82f6'}; border: ${category === 'opening' ? 'none' : '2px solid #3b82f6'}; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">${category}</button>
           `).join('')}
         </div>
       </div>
       
       <!-- フレーズリスト -->
       <div id="manual-phrases-list">
-        ${renderManualPhrases(null, null)}
+        ${renderManualPhrases('opening', null)}
       </div>
     </main>
     
@@ -1079,18 +1079,13 @@ async function showManual() {
 function renderManualPhrases(category, searchTerm) {
   let html = '';
   
-  // カテゴリ表示順序を定義（オープニング系を最初に）
+  // カテゴリ表示順序を定義（第1段階→第2段階→第3段階→第4段階の順）
   const categoryOrder = [
-    'オープニング',
-    '挨拶・確認',
-    '傾聴・共感',
-    '状況確認',
-    '施設説明',
-    '次のステップ',
-    '家族向け',
-    '緊急対応',
-    '医療連携',
-    'クロージング'
+    'opening',      // 第1段階
+    'listening',    // 第2段階
+    'information',  // 第3段階
+    'closing',      // 第4段階
+    'emergency'     // 緊急対応
   ];
   
   // カテゴリをソート（定義順 → 存在するカテゴリのみ表示）

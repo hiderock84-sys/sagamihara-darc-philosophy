@@ -250,6 +250,11 @@ app.get('/api/consultations/search', async (c) => {
 app.get('/api/stats/dashboard', async (c) => {
   const { DB } = c.env
   
+  // 本日の相談件数
+  const todayConsultations = await DB.prepare(
+    "SELECT COUNT(*) as count FROM consultations WHERE date(reception_datetime) = date('now', 'localtime')"
+  ).first()
+  
   // 総相談件数
   const totalConsultations = await DB.prepare(
     'SELECT COUNT(*) as count FROM consultations'
@@ -281,6 +286,10 @@ app.get('/api/stats/dashboard', async (c) => {
   ).all()
   
   return c.json({
+    today: (todayConsultations as any)?.count || 0,
+    inProgress: 0,  // 対応中の件数（現在未実装）
+    pending: 0,  // 未完了の件数（現在未実装）
+    avgDuration: 0,  // 平均時間（現在未実装）
     totalConsultations: (totalConsultations as any)?.count || 0,
     thisMonthConsultations: (thisMonthConsultations as any)?.count || 0,
     emergencyStats: emergencyStats.results,

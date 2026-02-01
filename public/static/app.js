@@ -1079,13 +1079,13 @@ async function showManual() {
 function renderManualPhrases(category, searchTerm) {
   let html = '';
   
-  // カテゴリ表示順序を定義（第1段階→第2段階→第3段階→第4段階の順）
+  // カテゴリ表示順序を定義（opening → listening → information → emergency → closing）
   const categoryOrder = [
     'opening',      // 第1段階
     'listening',    // 第2段階
     'information',  // 第3段階
-    'closing',      // 第4段階
-    'emergency'     // 緊急対応
+    'emergency',    // 緊急対応
+    'closing'       // 第4段階
   ];
   
   // カテゴリをソート（定義順 → 存在するカテゴリのみ表示）

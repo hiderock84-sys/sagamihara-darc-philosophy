@@ -67,8 +67,8 @@ app.post('/api/consultations', async (c) => {
         reception_datetime, staff_name, 
         caller_name, caller_phone, caller_relationship,
         addiction_types, emergency_level, 
-        consultation_content, notes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        consultation_content, notes, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       new Date().toISOString(),
       staffName,
@@ -78,7 +78,8 @@ app.post('/api/consultations', async (c) => {
       data.addiction_type || '',
       data.urgency_level || '中',
       data.phases || '{}',
-      data.target_name ? `対象者: ${data.target_name}` : ''
+      data.target_name ? `対象者: ${data.target_name}` : '',
+      data.status || '対応中'  // デフォルトは「対応中」
     ).run()
     
     return c.json({ 
@@ -255,6 +256,16 @@ app.get('/api/stats/dashboard', async (c) => {
     "SELECT COUNT(*) as count FROM consultations WHERE date(reception_datetime) = date('now', 'localtime')"
   ).first()
   
+  // 対応中の件数
+  const inProgressConsultations = await DB.prepare(
+    "SELECT COUNT(*) as count FROM consultations WHERE status = '対応中'"
+  ).first()
+  
+  // 未完了の件数
+  const pendingConsultations = await DB.prepare(
+    "SELECT COUNT(*) as count FROM consultations WHERE status = '未完了'"
+  ).first()
+  
   // 総相談件数
   const totalConsultations = await DB.prepare(
     'SELECT COUNT(*) as count FROM consultations'
@@ -287,8 +298,8 @@ app.get('/api/stats/dashboard', async (c) => {
   
   return c.json({
     today: (todayConsultations as any)?.count || 0,
-    inProgress: 0,  // 対応中の件数（現在未実装）
-    pending: 0,  // 未完了の件数（現在未実装）
+    inProgress: (inProgressConsultations as any)?.count || 0,
+    pending: (pendingConsultations as any)?.count || 0,
     avgDuration: 0,  // 平均時間（現在未実装）
     totalConsultations: (totalConsultations as any)?.count || 0,
     thisMonthConsultations: (thisMonthConsultations as any)?.count || 0,

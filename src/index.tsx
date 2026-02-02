@@ -298,6 +298,74 @@ app.get('/api/stats/dashboard', async (c) => {
   })
 })
 
+// 統計情報API（期間別）
+app.get('/api/stats/period', async (c) => {
+  const { DB } = c.env
+  const period = c.req.query('period') || 'week' // week, month, year
+  
+  let dateFilter = ''
+  let groupBy = ''
+  
+  switch(period) {
+    case 'week':
+      // 過去7日間
+      dateFilter = "date(reception_datetime) >= date('now', 'localtime', '-7 days')"
+      groupBy = "strftime('%w', reception_datetime)" // 曜日でグループ化
+      break
+    case 'month':
+      // 今月
+      dateFilter = "strftime('%Y-%m', reception_datetime) = strftime('%Y-%m', 'now', 'localtime')"
+      groupBy = "strftime('%d', reception_datetime)" // 日付でグループ化
+      break
+    case 'year':
+      // 今年
+      dateFilter = "strftime('%Y', reception_datetime) = strftime('%Y', 'now', 'localtime')"
+      groupBy = "strftime('%m', reception_DateTime)" // 月でグループ化
+      break
+  }
+  
+  // 期間別相談件数
+  const periodStats = await DB.prepare(`
+    SELECT ${groupBy} as period, COUNT(*) as count 
+    FROM consultations 
+    WHERE ${dateFilter}
+    GROUP BY ${groupBy}
+    ORDER BY period
+  `).all()
+  
+  // 依存症種類別
+  const byType = await DB.prepare(`
+    SELECT addiction_types as type, COUNT(*) as count 
+    FROM consultations 
+    WHERE ${dateFilter} AND addiction_types IS NOT NULL
+    GROUP BY addiction_types 
+    ORDER BY count DESC
+  `).all()
+  
+  // 緊急度別
+  const byUrgency = await DB.prepare(`
+    SELECT emergency_level as level, COUNT(*) as count 
+    FROM consultations 
+    WHERE ${dateFilter}
+    GROUP BY emergency_level
+  `).all()
+  
+  // 総件数
+  const totalCount = await DB.prepare(`
+    SELECT COUNT(*) as count 
+    FROM consultations 
+    WHERE ${dateFilter}
+  `).first()
+  
+  return c.json({
+    period,
+    totalCount: (totalCount as any)?.count || 0,
+    periodStats: periodStats.results,
+    byType: byType.results,
+    byUrgency: byUrgency.results
+  })
+})
+
 // ==========================================
 // PWAファイル配信（静的ファイルとして配信）
 // ==========================================

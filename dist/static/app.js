@@ -912,30 +912,203 @@ function exportConsultationPDF(id) {
 async function showStatistics() {
   currentPage = 'statistics';
   
-  // ダミーデータ（実際のAPIが実装されたら置き換え）
-  const stats = {
-    weekly: [
-      { day: '月', count: 12 },
-      { day: '火', count: 15 },
-      { day: '水', count: 10 },
-      { day: '木', count: 18 },
-      { day: '金', count: 14 },
-      { day: '土', count: 8 },
-      { day: '日', count: 6 }
-    ],
-    byType: [
-      { type: 'アルコール依存', count: 25 },
-      { type: '薬物依存', count: 18 },
-      { type: 'ギャンブル依存', count: 12 },
-      { type: 'ゲーム依存', count: 8 },
-      { type: 'その他', count: 20 }
-    ],
-    byUrgency: [
-      { level: '高', count: 15 },
-      { level: '中', count: 48 },
-      { level: '低', count: 20 }
-    ]
-  };
+  // 初期表示は今週
+  const stats = await loadStatsPeriod('week');
+  
+  renderStatisticsPage(stats, 'week');
+}
+
+// 統計データを取得
+async function loadStatsPeriod(period) {
+  try {
+    const response = await fetch(`${API_BASE}/stats/period?period=${period}`);
+    if (!response.ok) throw new Error('統計取得失敗');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('統計取得エラー:', error);
+    return {
+      period: period,
+      totalCount: 0,
+      periodStats: [],
+      byType: [],
+      byUrgency: []
+    };
+  }
+}
+
+// 統計画面をレンダリング
+function renderStatisticsPage(stats, selectedPeriod) {
+  const app = document.getElementById('app');
+  
+  // 期間別のラベル作成
+  let periodLabels = [];
+  if (selectedPeriod === 'week') {
+    periodLabels = ['日', '月', '火', '水', '木', '金', '土'];
+  } else if (selectedPeriod === 'month') {
+    // 1日〜31日
+    for (let i = 1; i <= 31; i++) {
+      periodLabels.push(i + '日');
+    }
+  } else if (selectedPeriod === 'year') {
+    periodLabels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+  }
+  
+  // 期間別データを整形
+  const periodData = {};
+  stats.periodStats.forEach(item => {
+    periodData[item.period] = item.count;
+  });
+  
+  // チャート用データ作成
+  const chartData = periodLabels.map((label, index) => {
+    if (selectedPeriod === 'week') {
+      return periodData[index] || 0;
+    } else if (selectedPeriod === 'month') {
+      return periodData[String(index + 1).padStart(2, '0')] || 0;
+    } else {
+      return periodData[String(index + 1).padStart(2, '0')] || 0;
+    }
+  });
+  
+  app.innerHTML = `
+    ${renderHeader('統計情報', true)}
+    
+    <main style="max-width: 480px; margin: 0 auto; padding: 16px;">
+      <!-- 期間選択 -->
+      <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+        <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 700; color: #1f2937;">期間選択</h3>
+        <div style="display: flex; gap: 8px;">
+          <button onclick="loadAndRenderStats('week')" style="flex: 1; padding: 10px; background: ${selectedPeriod === 'week' ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : 'white'}; color: ${selectedPeriod === 'week' ? 'white' : '#3b82f6'}; border: ${selectedPeriod === 'week' ? 'none' : '2px solid #3b82f6'}; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">今週</button>
+          <button onclick="loadAndRenderStats('month')" style="flex: 1; padding: 10px; background: ${selectedPeriod === 'month' ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : 'white'}; color: ${selectedPeriod === 'month' ? 'white' : '#3b82f6'}; border: ${selectedPeriod === 'month' ? 'none' : '2px solid #3b82f6'}; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">今月</button>
+          <button onclick="loadAndRenderStats('year')" style="flex: 1; padding: 10px; background: ${selectedPeriod === 'year' ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : 'white'}; color: ${selectedPeriod === 'year' ? 'white' : '#3b82f6'}; border: ${selectedPeriod === 'year' ? 'none' : '2px solid #3b82f6'}; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">今年</button>
+        </div>
+      </div>
+      
+      <!-- サマリー -->
+      <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #1f2937;">${selectedPeriod === 'week' ? '今週' : selectedPeriod === 'month' ? '今月' : '今年'}のサマリー</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: 12px; padding: 16px; text-align: center;">
+            <p style="margin: 0; font-size: 28px; font-weight: 800; color: #1e40af;">${stats.totalCount}</p>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #1e40af; font-weight: 600;">総相談件数</p>
+          </div>
+          <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 12px; padding: 16px; text-align: center;">
+            <p style="margin: 0; font-size: 28px; font-weight: 800; color: #b45309;">${Math.round(stats.totalCount / (selectedPeriod === 'week' ? 7 : selectedPeriod === 'month' ? 30 : 365))}</p>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #b45309; font-weight: 600;">1日平均</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 期間別グラフ -->
+      <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #1f2937;">期間別相談件数</h3>
+        <canvas id="periodChart" style="max-height: 240px;"></canvas>
+      </div>
+      
+      <!-- 依存症種類別 -->
+      <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #1f2937;">依存症種類別</h3>
+        <canvas id="typeChart" style="max-height: 240px;"></canvas>
+      </div>
+      
+      <!-- 緊急度別 -->
+      <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #1f2937;">緊急度別</h3>
+        <canvas id="urgencyChart" style="max-height: 240px;"></canvas>
+      </div>
+      
+      <!-- CSV出力ボタン -->
+      <button onclick="exportStatsCSV()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.3); margin-bottom: 16px;">
+        📊 CSV出力
+      </button>
+    </main>
+    
+    ${renderFooter()}
+  `;
+  
+  // Chart.jsでグラフを描画
+  setTimeout(() => {
+    // 期間別グラフ
+    const periodCtx = document.getElementById('periodChart').getContext('2d');
+    new Chart(periodCtx, {
+      type: 'bar',
+      data: {
+        labels: periodLabels,
+        datasets: [{
+          label: '相談件数',
+          data: chartData,
+          backgroundColor: 'rgba(59, 130, 246, 0.5)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        }
+      }
+    });
+    
+    // 依存症種類別グラフ
+    const typeCtx = document.getElementById('typeChart').getContext('2d');
+    new Chart(typeCtx, {
+      type: 'doughnut',
+      data: {
+        labels: stats.byType.map(item => item.type),
+        datasets: [{
+          data: stats.byType.map(item => item.count),
+          backgroundColor: [
+            'rgba(239, 68, 68, 0.7)',
+            'rgba(59, 130, 246, 0.7)',
+            'rgba(16, 185, 129, 0.7)',
+            'rgba(245, 158, 11, 0.7)',
+            'rgba(139, 92, 246, 0.7)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true
+      }
+    });
+    
+    // 緊急度別グラフ
+    const urgencyCtx = document.getElementById('urgencyChart').getContext('2d');
+    new Chart(urgencyCtx, {
+      type: 'pie',
+      data: {
+        labels: stats.byUrgency.map(item => item.level),
+        datasets: [{
+          data: stats.byUrgency.map(item => item.count),
+          backgroundColor: [
+            'rgba(239, 68, 68, 0.7)',
+            'rgba(245, 158, 11, 0.7)',
+            'rgba(16, 185, 129, 0.7)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true
+      }
+    });
+  }, 100);
+}
+
+// 期間を切り替えて再レンダリング
+async function loadAndRenderStats(period) {
+  showInfo(`${period === 'week' ? '今週' : period === 'month' ? '今月' : '今年'}のデータを読み込み中...`);
+  const stats = await loadStatsPeriod(period);
+  renderStatisticsPage(stats, period);
+}
   
   const app = document.getElementById('app');
   app.innerHTML = `
@@ -1017,13 +1190,6 @@ function renderBarChart(data, labelKey, valueKey, color) {
       }).join('')}
     </div>
   `;
-}
-
-function loadStatsPeriod(period) {
-  showInfo(`${period === 'week' ? '今週' : period === 'month' ? '今月' : '今年'}のデータを読み込み中...`);
-  setTimeout(() => {
-    showStatistics();
-  }, 500);
 }
 
 function exportStatsCSV() {

@@ -1109,65 +1109,6 @@ async function loadAndRenderStats(period) {
   const stats = await loadStatsPeriod(period);
   renderStatisticsPage(stats, period);
 }
-  
-  const app = document.getElementById('app');
-  app.innerHTML = `
-    ${renderHeader('統計情報', true)}
-    
-    <main style="max-width: 480px; margin: 0 auto; padding: 16px;">
-      <!-- 期間選択 -->
-      <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-        <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 700; color: #1f2937;">期間選択</h3>
-        <div style="display: flex; gap: 8px;">
-          <button onclick="loadStatsPeriod('week')" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">今週</button>
-          <button onclick="loadStatsPeriod('month')" style="flex: 1; padding: 10px; background: white; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">今月</button>
-          <button onclick="loadStatsPeriod('year')" style="flex: 1; padding: 10px; background: white; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">今年</button>
-        </div>
-      </div>
-      
-      <!-- サマリー -->
-      <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #1f2937;">今週のサマリー</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: 12px; padding: 16px; text-align: center;">
-            <p style="margin: 0; font-size: 28px; font-weight: 800; color: #1e40af;">${stats.weekly.reduce((sum, day) => sum + day.count, 0)}</p>
-            <p style="margin: 4px 0 0 0; font-size: 13px; color: #1e40af; font-weight: 600;">総相談件数</p>
-          </div>
-          <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); border-radius: 12px; padding: 16px; text-align: center;">
-            <p style="margin: 0; font-size: 28px; font-weight: 800; color: #166534;">${Math.round(stats.weekly.reduce((sum, day) => sum + day.count, 0) / 7)}</p>
-            <p style="margin: 4px 0 0 0; font-size: 13px; color: #166534; font-weight: 600;">1日平均</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 曜日別グラフ -->
-      <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #1f2937;">曜日別相談件数</h3>
-        ${renderBarChart(stats.weekly, 'day', 'count', '#3b82f6')}
-      </div>
-      
-      <!-- 依存症別グラフ -->
-      <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #1f2937;">依存症別分布</h3>
-        ${renderBarChart(stats.byType, 'type', 'count', '#10b981')}
-      </div>
-      
-      <!-- 緊急度別グラフ -->
-      <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-        <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #1f2937;">緊急度別分布</h3>
-        ${renderBarChart(stats.byUrgency, 'level', 'count', '#8b5cf6')}
-      </div>
-      
-      <!-- エクスポート -->
-      <div style="display: flex; gap: 8px;">
-        <button onclick="exportStatsCSV()" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer;">CSV出力</button>
-        <button onclick="exportStatsPDF()" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer;">PDF出力</button>
-      </div>
-    </main>
-    
-    ${renderFooter()}
-  `;
-}
 
 function renderBarChart(data, labelKey, valueKey, color) {
   const maxValue = Math.max(...data.map(item => item[valueKey]));

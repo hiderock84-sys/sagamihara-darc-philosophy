@@ -1310,3 +1310,156 @@ document.addEventListener('touchend', (e) => {
   touchEndY = e.changedTouches[0].screenY;
   handleSwipe();
 }, { passive: true });
+
+// ==========================================
+// プルダウン更新機能 (Pull to Refresh)
+// ==========================================
+
+let pullStartY = 0;
+let pullCurrentY = 0;
+let isPulling = false;
+let refreshIndicator = null;
+
+// 更新インジケーターを作成
+function createRefreshIndicator() {
+  if (!refreshIndicator) {
+    refreshIndicator = document.createElement('div');
+    refreshIndicator.id = 'refresh-indicator';
+    refreshIndicator.style.cssText = `
+      position: fixed;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      z-index: 9999;
+      transition: top 0.3s ease;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    `;
+    refreshIndicator.innerHTML = '🔄';
+    document.body.appendChild(refreshIndicator);
+  }
+  return refreshIndicator;
+}
+
+// プルダウン更新処理
+async function handlePullToRefresh() {
+  const indicator = createRefreshIndicator();
+  indicator.style.top = '20px';
+  indicator.style.animation = 'spin 1s linear infinite';
+  
+  // CSSアニメーションを追加
+  if (!document.getElementById('refresh-animation-style')) {
+    const style = document.createElement('style');
+    style.id = 'refresh-animation-style';
+    style.textContent = `
+      @keyframes spin {
+        from { transform: translateX(-50%) rotate(0deg); }
+        to { transform: translateX(-50%) rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  // ホーム画面の場合は統計データを再取得
+  if (currentPage === 'home') {
+    await showHomePage();
+  }
+  
+  // 少し待ってからインジケーターを非表示
+  setTimeout(() => {
+    indicator.style.top = '-60px';
+    indicator.style.animation = '';
+  }, 1000);
+}
+
+// プルダウン用のタッチイベント
+document.addEventListener('touchstart', (e) => {
+  // スクロール位置が最上部の場合のみプルダウン有効
+  if (window.scrollY === 0) {
+    pullStartY = e.touches[0].clientY;
+    isPulling = true;
+  }
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+  if (!isPulling) return;
+  
+  pullCurrentY = e.touches[0].clientY;
+  const pullDistance = pullCurrentY - pullStartY;
+  
+  // 下方向に50px以上引っ張った場合
+  if (pullDistance > 50 && window.scrollY === 0) {
+    const indicator = createRefreshIndicator();
+    const displayDistance = Math.min(pullDistance - 50, 40);
+    indicator.style.top = `${displayDistance}px`;
+  }
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+  if (!isPulling) return;
+  
+  const pullDistance = pullCurrentY - pullStartY;
+  
+  // 80px以上引っ張った場合は更新実行
+  if (pullDistance > 80 && window.scrollY === 0) {
+    handlePullToRefresh();
+  } else {
+    // 更新しない場合はインジケーターを戻す
+    const indicator = createRefreshIndicator();
+    indicator.style.top = '-60px';
+  }
+  
+  isPulling = false;
+  pullStartY = 0;
+  pullCurrentY = 0;
+}, { passive: true });
+
+// ==========================================
+// 自動更新機能
+// ==========================================
+
+let autoRefreshInterval = null;
+
+// 自動更新を開始（30秒ごと）
+function startAutoRefresh() {
+  // 既存のインターバルをクリア
+  if (autoRefreshInterval) {
+    clearInterval(autoRefreshInterval);
+  }
+  
+  // 30秒ごとにホーム画面の統計を更新
+  autoRefreshInterval = setInterval(() => {
+    if (currentPage === 'home') {
+      console.log('🔄 自動更新: 統計データを更新中...');
+      showHomePage();
+    }
+  }, 30000); // 30秒 = 30000ミリ秒
+  
+  console.log('✅ 自動更新を開始しました（30秒ごと）');
+}
+
+// 自動更新を停止
+function stopAutoRefresh() {
+  if (autoRefreshInterval) {
+    clearInterval(autoRefreshInterval);
+    autoRefreshInterval = null;
+    console.log('⏹️ 自動更新を停止しました');
+  }
+}
+
+// ページ読み込み時に自動更新を開始
+window.addEventListener('load', () => {
+  startAutoRefresh();
+});
+
+// ページを離れる時に自動更新を停止
+window.addEventListener('beforeunload', () => {
+  stopAutoRefresh();
+});

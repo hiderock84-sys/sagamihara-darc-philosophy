@@ -656,7 +656,7 @@ function addPhraseToPhase(phase, phraseId) {
   container.appendChild(phraseDiv);
 }
 
-async function saveConsultationData() {
+async function saveConsultationData(isEdit = false) {
   // 二重クリック防止
   if (window.isSaving) {
     return;
@@ -685,26 +685,50 @@ async function saveConsultationData() {
     // データ整形
     const dataToSave = {
       ...currentConsultation,
-      target_age: currentConsultation.target_age ? parseInt(currentConsultation.target_age) : null,
-      phases: JSON.stringify(currentConsultation.phases),
+      caller_age: currentConsultation.caller_age ? parseInt(currentConsultation.caller_age) : null,
+      consultation_content: JSON.stringify(currentConsultation.phases),
+      addiction_types: currentConsultation.addiction_type,
+      emergency_level: currentConsultation.urgency_level,
       status: 'completed'
     };
     
-    // 保存
-    await saveConsultation(dataToSave);
-    
-    // 成功メッセージ
-    showSuccess('相談内容を保存しました');
-    
-    // 2秒後にホーム画面へ
-    setTimeout(() => {
-      window.isSaving = false;
-      showHomePage();
-    }, 2000);
+    if (isEdit) {
+      // 編集モード：更新処理
+      // 編集者情報を追加（ここではスタッフ名を使用）
+      dataToSave.updated_by = currentConsultation.staff_name || '不明';
+      
+      const response = await fetch(`${API_BASE}/consultations/${currentConsultation.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dataToSave)
+      });
+      
+      if (!response.ok) throw new Error('更新失敗');
+      
+      showSuccess('相談記録を更新しました');
+      
+      // 2秒後に詳細画面へ
+      setTimeout(() => {
+        window.isSaving = false;
+        showConsultationDetail(currentConsultation.id);
+      }, 2000);
+      
+    } else {
+      // 新規モード：保存処理
+      await saveConsultation(dataToSave);
+      
+      showSuccess('相談内容を保存しました');
+      
+      // 2秒後にホーム画面へ
+      setTimeout(() => {
+        window.isSaving = false;
+        showHomePage();
+      }, 2000);
+    }
     
   } catch (error) {
     console.error('保存エラー:', error);
-    showError('保存に失敗しました');
+    showError(isEdit ? '更新に失敗しました' : '保存に失敗しました');
     window.isSaving = false;
   }
 }
@@ -855,20 +879,144 @@ function clearHistoryFilter() {
 }
 
 let editingConsultation = null;
+let isEditMode = false;
 
-async function showConsultationDetail(id) {
+async function showConsultationDetail(id, editMode = false) {
   try {
     const response = await fetch(`${API_BASE}/consultations/${id}`);
     if (!response.ok) throw new Error('詳細取得失敗');
     const data = await response.json();
     const consultation = data.consultation || data;
     editingConsultation = consultation;
+    isEditMode = editMode;
     
-    const date = new Date(consultation.created_at || consultation.reception_datetime);
-    const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-    const urgencyLevel = consultation.emergency_level || '中';
-    const urgencyColor = urgencyLevel === '高' ? '#ef4444' : urgencyLevel === '中' ? '#f59e0b' : '#10b981';
+    if (editMode) {
+      renderConsultationEditMode(consultation);
+    } else {
+      renderConsultationViewMode(consultation);
+    }
+  } catch (error) {
+    console.error('詳細取得エラー:', error);
+    showError('詳細情報の取得に失敗しました');
+  }
+}
+
+function renderConsultationViewMode(consultation) {
+  const date = new Date(consultation.created_at || consultation.reception_datetime);
+  const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  const urgencyLevel = consultation.emergency_level || '中';
+  const urgencyColor = urgencyLevel === '高' ? '#ef4444' : urgencyLevel === '中' ? '#f59e0b' : '#10b981';
+  
+  let phases = {};
+  try {
+    phases = JSON.parse(consultation.consultation_content || '{}');
+  } catch (e) {
+    console.error('フェーズパースエラー:', e);
+  }
+  
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    ${renderHeader('相談詳細', true)}
     
+    <main style="max-width: 480px; margin: 0 auto; padding: 16px; padding-bottom: 100px;">
+      <!-- 基本情報 -->
+      <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+          <div>
+            <h3 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700; color: #1f2937;">${consultation.caller_name || '（氏名なし）'}</h3>
+            <p style="margin: 0; font-size: 13px; color: #6b7280;">${dateStr}</p>
+          </div>
+          <span style="background: ${urgencyColor}; color: white; padding: 6px 14px; border-radius: 12px; font-size: 13px; font-weight: 600;">${urgencyLevel}</span>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+          <div>
+            <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">電話番号</p>
+            <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.caller_phone || '未記載'}</p>
+          </div>
+          <div>
+            <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">年齢</p>
+            <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.caller_age ? consultation.caller_age + '歳' : '未記載'}</p>
+          </div>
+          <div>
+            <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">性別</p>
+            <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.caller_gender || '未記載'}</p>
+          </div>
+          <div>
+            <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">関係</p>
+            <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.caller_relationship || '不明'}</p>
+          </div>
+          <div>
+            <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">依存症</p>
+            <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.addiction_types || '未分類'}</p>
+          </div>
+          <div>
+            <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">対応スタッフ</p>
+            <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.staff_name || '不明'}</p>
+          </div>
+        </div>
+      </div>
+      
+      ${consultation.updated_at && consultation.updated_by ? `
+        <div style="background: #fef3c7; border-radius: 12px; padding: 12px; margin-bottom: 16px; border-left: 4px solid #f59e0b;">
+          <p style="margin: 0; font-size: 13px; color: #92400e;">
+            <strong>最終更新:</strong> ${new Date(consultation.updated_at).toLocaleString('ja-JP')} / ${consultation.updated_by}
+          </p>
+        </div>
+      ` : ''}
+      
+      <!-- メモ -->
+      ${consultation.notes ? `
+        <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+          <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 700; color: #1f2937; border-bottom: 2px solid #10b981; padding-bottom: 6px;">メモ</h3>
+          <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6; white-space: pre-wrap;">${consultation.notes}</p>
+        </div>
+      ` : ''}
+      
+      <!-- 対応フェーズ -->
+      ${Object.keys(phases).length > 0 ? `
+        <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+          <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #1f2937; border-bottom: 2px solid #8b5cf6; padding-bottom: 6px;">対応履歴</h3>
+          ${Object.entries(phases).map(([phase, data], index) => `
+            <div style="margin-bottom: 16px; ${index === Object.keys(phases).length - 1 ? '' : 'border-bottom: 1px solid #e5e7eb; padding-bottom: 16px;'}">
+              <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0;">${index + 1}</div>
+                <h4 style="margin: 0 0 0 10px; font-size: 14px; font-weight: 700; color: #1f2937;">${PHASE_REVERSE_MAPPING[phase] || phase}</h4>
+              </div>
+              ${data.content ? `<p style="margin: 0; font-size: 13px; color: #374151; line-height: 1.6; white-space: pre-wrap;">${data.content}</p>` : '<p style="margin: 0; font-size: 13px; color: #9ca3af; font-style: italic;">記録なし</p>'}
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+      
+      <!-- アクションボタン -->
+      <div style="position: fixed; bottom: 70px; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; padding: 12px 16px; z-index: 100;">
+        <div style="max-width: 480px; margin: 0 auto; display: flex; gap: 8px;">
+          <button onclick="showHistory()" style="flex: 1; padding: 14px; background: white; color: #6b7280; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer;">戻る</button>
+          <button onclick="showConsultationDetail(${consultation.id}, true)" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer;">✏️ 編集</button>
+        </div>
+      </div>
+    </main>
+    
+    ${renderFooter()}
+  `;
+}
+
+function renderConsultationEditMode(consultation) {
+  showConsultationForm(consultation);
+}
+
+function exportConsultationPDF(id) {
+  showInfo('PDF出力機能は開発中です');
+}
+
+// 編集フォーム表示（新規/編集両対応）
+function showConsultationForm(consultation = null) {
+  const isEdit = !!consultation;
+  currentPage = isEdit ? 'edit-consultation' : 'new-consultation';
+  
+  // 編集モードの場合、既存データをセット
+  if (isEdit) {
     let phases = {};
     try {
       phases = JSON.parse(consultation.consultation_content || '{}');
@@ -876,82 +1024,194 @@ async function showConsultationDetail(id) {
       console.error('フェーズパースエラー:', e);
     }
     
-    const app = document.getElementById('app');
-    app.innerHTML = `
-      ${renderHeader('相談詳細', true)}
+    currentConsultation = {
+      id: consultation.id,
+      staff_name: consultation.staff_name || '',
+      caller_name: consultation.caller_name || '',
+      caller_age: consultation.caller_age || null,
+      caller_gender: consultation.caller_gender || '',
+      caller_phone: consultation.caller_phone || '',
+      caller_relationship: consultation.caller_relationship || '',
+      addiction_type: consultation.addiction_types || '',
+      urgency_level: consultation.emergency_level || '中',
+      notes: consultation.notes || '',
+      phases: phases
+    };
+  } else {
+    currentConsultation = {
+      caller_name: '',
+      caller_phone: '',
+      caller_relationship: '',
+      target_name: '',
+      target_age: null,
+      target_gender: '',
+      addiction_type: '',
+      urgency_level: '中',
+      phases: {},
+      staff_id: staffList[0]?.id || null
+    };
+  }
+  
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    ${renderHeader(isEdit ? '相談記録編集' : '新規相談受付', true)}
+    
+    <main style="max-width: 480px; margin: 0 auto; padding: 16px; padding-bottom: 100px;">
+      ${isEdit && consultation.updated_at && consultation.updated_by ? `
+        <div style="background: #fef3c7; border-radius: 12px; padding: 12px; margin-bottom: 16px; border-left: 4px solid #f59e0b;">
+          <p style="margin: 0; font-size: 13px; color: #92400e;">
+            <strong>最終更新:</strong> ${new Date(consultation.updated_at).toLocaleString('ja-JP')} / ${consultation.updated_by}
+          </p>
+        </div>
+      ` : ''}
       
-      <main style="max-width: 480px; margin: 0 auto; padding: 16px;">
-        <!-- 基本情報 -->
-        <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
-            <div>
-              <h3 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700; color: #1f2937;">${consultation.caller_name || '（氏名なし）'}</h3>
-              <p style="margin: 0; font-size: 13px; color: #6b7280;">${dateStr}</p>
-            </div>
-            <span style="background: ${urgencyColor}; color: white; padding: 6px 14px; border-radius: 12px; font-size: 13px; font-weight: 600;">${urgencyLevel}</span>
+      <!-- 基本情報入力 -->
+      <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+        <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #1f2937; border-bottom: 2px solid #3b82f6; padding-bottom: 8px;">基本情報</h3>
+        
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: #374151;">対応スタッフ <span style="color: #ef4444;">*</span></label>
+          ${isEdit ? `
+            <input type="text" id="staff_name" value="${currentConsultation.staff_name}" onchange="updateConsultationField('staff_name', this.value)" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+          ` : `
+            <select id="staff_id" onchange="updateConsultationField('staff_id', this.value)" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; background: white;">
+              ${staffList.map(staff => `<option value="${staff.id}" ${staff.id === currentConsultation.staff_id ? 'selected' : ''}>${staff.name}</option>`).join('')}
+            </select>
+          `}
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: #374151;">相談者氏名 <span style="color: #ef4444;">*</span></label>
+          <input type="text" id="caller_name" value="${currentConsultation.caller_name}" onchange="updateConsultationField('caller_name', this.value)" placeholder="例: 田中太郎" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: #374151;">連絡先電話番号</label>
+          <input type="tel" id="caller_phone" value="${currentConsultation.caller_phone}" onchange="updateConsultationField('caller_phone', this.value)" placeholder="例: 090-1234-5678" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+        </div>
+        
+        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+          <div style="flex: 1;">
+            <label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: #374151;">年齢</label>
+            <input type="number" id="caller_age" value="${currentConsultation.caller_age || ''}" onchange="updateConsultationField('caller_age', this.value)" placeholder="例: 35" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
           </div>
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
-            <div>
-              <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">電話番号</p>
-              <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.caller_phone || '未記載'}</p>
-            </div>
-            <div>
-              <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">関係</p>
-              <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.caller_relationship || '不明'}</p>
-            </div>
-            <div>
-              <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">依存症</p>
-              <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.addiction_types || '未分類'}</p>
-            </div>
-            <div>
-              <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280; font-weight: 600;">対応スタッフ</p>
-              <p style="margin: 0; font-size: 14px; color: #1f2937;">${consultation.staff_name || '不明'}</p>
-            </div>
+          <div style="flex: 1;">
+            <label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: #374151;">性別</label>
+            <select id="caller_gender" onchange="updateConsultationField('caller_gender', this.value)" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; background: white;">
+              <option value="">選択</option>
+              <option value="男性" ${currentConsultation.caller_gender === '男性' ? 'selected' : ''}>男性</option>
+              <option value="女性" ${currentConsultation.caller_gender === '女性' ? 'selected' : ''}>女性</option>
+              <option value="その他" ${currentConsultation.caller_gender === 'その他' ? 'selected' : ''}>その他</option>
+            </select>
           </div>
         </div>
         
-        <!-- メモ -->
-        ${consultation.notes ? `
-          <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-            <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 700; color: #1f2937; border-bottom: 2px solid #10b981; padding-bottom: 6px;">メモ</h3>
-            <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6; white-space: pre-wrap;">${consultation.notes}</p>
-          </div>
-        ` : ''}
-        
-        <!-- 対応フェーズ -->
-        ${Object.keys(phases).length > 0 ? `
-          <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-            <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 700; color: #1f2937; border-bottom: 2px solid #8b5cf6; padding-bottom: 6px;">対応履歴</h3>
-            ${Object.entries(phases).map(([phase, data], index) => `
-              <div style="margin-bottom: 16px; ${index === Object.keys(phases).length - 1 ? '' : 'border-bottom: 1px solid #e5e7eb; padding-bottom: 16px;'}">
-                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                  <div style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0;">${index + 1}</div>
-                  <h4 style="margin: 0 0 0 10px; font-size: 14px; font-weight: 700; color: #1f2937;">${phase}</h4>
-                </div>
-                ${data.content ? `<p style="margin: 0; font-size: 13px; color: #374151; line-height: 1.6; white-space: pre-wrap;">${data.content}</p>` : '<p style="margin: 0; font-size: 13px; color: #9ca3af; font-style: italic;">記録なし</p>'}
-              </div>
-            `).join('')}
-          </div>
-        ` : ''}
-        
-        <!-- アクションボタン -->
-        <div style="display: flex; gap: 8px;">
-          <button onclick="showHistory()" style="flex: 1; padding: 14px; background: white; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer;">一覧に戻る</button>
-          <button onclick="exportConsultationPDF(${consultation.id})" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer;">PDF出力</button>
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: #374151;">ご本人との関係 <span style="color: #ef4444;">*</span></label>
+          <select id="caller_relationship" onchange="updateConsultationField('caller_relationship', this.value)" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; background: white;">
+            <option value="">選択してください</option>
+            <option value="本人" ${currentConsultation.caller_relationship === '本人' ? 'selected' : ''}>本人</option>
+            <option value="家族" ${currentConsultation.caller_relationship === '家族' ? 'selected' : ''}>家族</option>
+            <option value="友人" ${currentConsultation.caller_relationship === '友人' ? 'selected' : ''}>友人</option>
+            <option value="医療関係者" ${currentConsultation.caller_relationship === '医療関係者' ? 'selected' : ''}>医療関係者</option>
+            <option value="その他" ${currentConsultation.caller_relationship === 'その他' ? 'selected' : ''}>その他</option>
+          </select>
         </div>
-      </main>
+        
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: #374151;">依存症の種類 <span style="color: #ef4444;">*</span></label>
+          <select id="addiction_type" onchange="updateConsultationField('addiction_type', this.value)" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; background: white;">
+            <option value="">選択してください</option>
+            ${ADDICTION_TYPES.map(type => `<option value="${type}" ${currentConsultation.addiction_type === type ? 'selected' : ''}>${type}</option>`).join('')}
+          </select>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: #374151;">緊急度 <span style="color: #ef4444;">*</span></label>
+          <select id="urgency_level" onchange="updateConsultationField('urgency_level', this.value)" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; background: white;">
+            <option value="低" ${currentConsultation.urgency_level === '低' ? 'selected' : ''}>低 - 情報収集</option>
+            <option value="中" ${currentConsultation.urgency_level === '中' ? 'selected' : ''}>中 - 一般的な相談</option>
+            <option value="高" ${currentConsultation.urgency_level === '高' ? 'selected' : ''}>高 - 緊急対応必要</option>
+          </select>
+        </div>
+        
+        <div>
+          <label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: #374151;">メモ</label>
+          <textarea id="notes" onchange="updateConsultationField('notes', this.value)" placeholder="その他の情報やメモ..." style="width: 100%; min-height: 80px; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; resize: vertical;">${currentConsultation.notes}</textarea>
+        </div>
+      </div>
       
-      ${renderFooter()}
-    `;
-  } catch (error) {
-    console.error('詳細取得エラー:', error);
-    showError('詳細情報の取得に失敗しました');
+      <!-- 相談フェーズ -->
+      <div id="phases-container" style="margin-bottom: 16px;">
+        ${renderEditPhases()}
+      </div>
+      
+      <!-- 保存ボタン -->
+      <div style="position: fixed; bottom: 70px; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; padding: 12px 16px; z-index: 100;">
+        <div style="max-width: 480px; margin: 0 auto; display: flex; gap: 8px;">
+          <button onclick="${isEdit ? `showConsultationDetail(${consultation.id})` : 'showHomePage()'}" style="flex: 1; padding: 14px; background: white; color: #6b7280; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer;">キャンセル</button>
+          <button onclick="saveConsultationData(${isEdit})" style="flex: 2; padding: 14px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer;">
+            ${isEdit ? '✅ 更新' : '💾 保存'}
+          </button>
+        </div>
+      </div>
+    </main>
+    
+    ${renderFooter()}
+  `;
+  
+  // 編集モードの場合、フェーズ内容をプリフィル
+  if (isEdit) {
+    setTimeout(() => {
+      PHASES.forEach((phase, index) => {
+        const dbPhase = PHASE_MAPPING[phase] || phase;
+        const phaseData = currentConsultation.phases[dbPhase];
+        if (phaseData && phaseData.content) {
+          const textarea = document.getElementById(`phase_${index}_content`);
+          if (textarea) {
+            textarea.value = phaseData.content;
+          }
+        }
+      });
+    }, 100);
   }
 }
 
-function exportConsultationPDF(id) {
-  showInfo('PDF出力機能は開発中です');
+function renderEditPhases() {
+  return `
+    <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+      <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #1f2937; border-bottom: 2px solid #8b5cf6; padding-bottom: 8px;">対応フェーズ</h3>
+      
+      ${PHASES.map((phase, index) => `
+        <div style="margin-bottom: 20px; ${index === PHASES.length - 1 ? '' : 'border-bottom: 1px solid #e5e7eb; padding-bottom: 20px;'}">
+          <div style="display: flex; align-items: center; margin-bottom: 12px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;">${index + 1}</div>
+            <h4 style="margin: 0 0 0 12px; font-size: 16px; font-weight: 700; color: #1f2937;">${phase}</h4>
+          </div>
+          
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #6b7280;">対応内容</label>
+            <textarea id="phase_${index}_content" onchange="updatePhaseField('${phase}', 'content', this.value)" placeholder="この段階での対応内容を記録..." style="width: 100%; min-height: 80px; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
+          </div>
+          
+          <div>
+            <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #6b7280;">使用フレーズ</label>
+            <select onchange="addPhraseToPhase('${phase}', this.value); this.value='';" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; background: white;">
+              <option value="">よく使うフレーズを選択...</option>
+              ${Object.keys(phrasesByCategory).map(category => {
+                const dbPhase = PHASE_MAPPING[phase] || phase;
+                return phrasesByCategory[category][dbPhase] ? 
+                  `<optgroup label="${CATEGORY_DISPLAY_NAMES[category] || category}">
+                    ${phrasesByCategory[category][dbPhase].map(p => `<option value="${p.id}">${p.phrase_text.substring(0, 50)}...</option>`).join('')}
+                  </optgroup>` : '';
+              }).join('')}
+            </select>
+            <div id="phase_${index}_phrases" style="margin-top: 8px;"></div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
 }
 
 // ==========================================

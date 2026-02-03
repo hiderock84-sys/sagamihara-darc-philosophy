@@ -253,7 +253,7 @@ app.put('/api/consultations/:id', async (c) => {
         interview_scheduled = ?, interview_datetime = ?,
         followup_scheduled = ?, followup_datetime = ?,
         coordination_needed = ?, report_completed = ?, report_to = ?,
-        updated_at = datetime('now', 'localtime')
+        updated_by = ?, updated_at = datetime('now', 'localtime')
       WHERE id = ?
     `).bind(
       data.staff_name, data.caller_name, data.caller_age, data.caller_gender,
@@ -269,6 +269,7 @@ app.put('/api/consultations/:id', async (c) => {
       data.interview_scheduled ? 1 : 0, data.interview_datetime,
       data.followup_scheduled ? 1 : 0, data.followup_datetime,
       data.coordination_needed, data.report_completed ? 1 : 0, data.report_to,
+      data.updated_by,
       id
     ).run()
     

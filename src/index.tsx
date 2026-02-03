@@ -206,56 +206,70 @@ app.delete('/api/consultations/:id', async (c) => {
 
 // 検索API
 app.get('/api/consultations/search', async (c) => {
-  const { DB } = c.env
-  const callerName = c.req.query('caller_name') || ''
-  const addictionType = c.req.query('addiction_type') || ''
-  const urgencyLevel = c.req.query('urgency_level') || ''
-  const keyword = c.req.query('keyword') || ''
-  const dateFrom = c.req.query('date_from') || ''
-  const dateTo = c.req.query('date_to') || ''
-  
-  let sql = 'SELECT * FROM consultations WHERE 1=1'
-  const bindings: any[] = []
-  
-  if (callerName) {
-    sql += ' AND caller_name LIKE ?'
-    bindings.push(`%${callerName}%`)
+  try {
+    const { DB } = c.env
+    const callerName = c.req.query('caller_name') || ''
+    const addictionType = c.req.query('addiction_type') || ''
+    const urgencyLevel = c.req.query('urgency_level') || ''
+    const keyword = c.req.query('keyword') || ''
+    const dateFrom = c.req.query('date_from') || ''
+    const dateTo = c.req.query('date_to') || ''
+    
+    let sql = 'SELECT * FROM consultations WHERE 1=1'
+    const bindings: any[] = []
+    
+    if (callerName) {
+      sql += ' AND caller_name LIKE ?'
+      bindings.push(`%${callerName}%`)
+    }
+    
+    if (addictionType) {
+      sql += ' AND addiction_types LIKE ?'
+      bindings.push(`%${addictionType}%`)
+    }
+    
+    if (urgencyLevel) {
+      sql += ' AND emergency_level = ?'
+      bindings.push(urgencyLevel)
+    }
+    
+    if (keyword) {
+      sql += ' AND (caller_name LIKE ? OR consultation_content LIKE ? OR notes LIKE ?)'
+      const searchPattern = `%${keyword}%`
+      bindings.push(searchPattern, searchPattern, searchPattern)
+    }
+    
+    if (dateFrom) {
+      sql += ' AND reception_datetime >= ?'
+      bindings.push(dateFrom)
+    }
+    
+    if (dateTo) {
+      sql += ' AND reception_datetime <= ?'
+      bindings.push(dateTo)
+    }
+    
+    sql += ' ORDER BY reception_datetime DESC LIMIT 100'
+    
+    console.log('検索SQL:', sql)
+    console.log('バインド値:', bindings)
+    
+    const result = await DB.prepare(sql).bind(...bindings).all()
+    
+    console.log('検索結果件数:', result.results?.length || 0)
+    
+    return c.json({ 
+      consultations: result.results || [],
+      total: result.results?.length || 0
+    })
+  } catch (error: any) {
+    console.error('検索エラー:', error)
+    return c.json({ 
+      consultations: [],
+      total: 0,
+      error: error.message 
+    }, 500)
   }
-  
-  if (addictionType) {
-    sql += ' AND addiction_types LIKE ?'
-    bindings.push(`%${addictionType}%`)
-  }
-  
-  if (urgencyLevel) {
-    sql += ' AND emergency_level = ?'
-    bindings.push(urgencyLevel)
-  }
-  
-  if (keyword) {
-    sql += ' AND (caller_name LIKE ? OR consultation_content LIKE ? OR notes LIKE ?)'
-    const searchPattern = `%${keyword}%`
-    bindings.push(searchPattern, searchPattern, searchPattern)
-  }
-  
-  if (dateFrom) {
-    sql += ' AND reception_datetime >= ?'
-    bindings.push(dateFrom)
-  }
-  
-  if (dateTo) {
-    sql += ' AND reception_datetime <= ?'
-    bindings.push(dateTo)
-  }
-  
-  sql += ' ORDER BY reception_datetime DESC LIMIT 100'
-  
-  const result = await DB.prepare(sql).bind(...bindings).all()
-  
-  return c.json({ 
-    consultations: result.results,
-    total: result.results.length 
-  })
 })
 
 // ==========================================

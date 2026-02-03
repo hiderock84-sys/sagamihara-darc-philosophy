@@ -95,6 +95,83 @@ app.post('/api/consultations', async (c) => {
   }
 })
 
+// 検索API（一覧APIより先に定義）
+app.get('/api/consultations/search', async (c) => {
+  try {
+    const { DB } = c.env
+    
+    if (!DB) {
+      return c.json({ 
+        consultations: [],
+        total: 0,
+        error: 'Database not available' 
+      }, 500)
+    }
+    
+    const callerName = c.req.query('caller_name') || ''
+    const addictionType = c.req.query('addiction_type') || ''
+    const urgencyLevel = c.req.query('urgency_level') || ''
+    const keyword = c.req.query('keyword') || ''
+    const dateFrom = c.req.query('date_from') || ''
+    const dateTo = c.req.query('date_to') || ''
+    
+    let sql = 'SELECT * FROM consultations WHERE 1=1'
+    const bindings: any[] = []
+    
+    if (callerName && callerName.trim()) {
+      sql += ' AND caller_name LIKE ?'
+      bindings.push(`%${callerName.trim()}%`)
+    }
+    
+    if (addictionType && addictionType.trim()) {
+      sql += ' AND addiction_types LIKE ?'
+      bindings.push(`%${addictionType.trim()}%`)
+    }
+    
+    if (urgencyLevel && urgencyLevel.trim()) {
+      sql += ' AND emergency_level = ?'
+      bindings.push(urgencyLevel.trim())
+    }
+    
+    if (keyword && keyword.trim()) {
+      sql += ' AND (caller_name LIKE ? OR consultation_content LIKE ? OR notes LIKE ?)'
+      const searchPattern = `%${keyword.trim()}%`
+      bindings.push(searchPattern, searchPattern, searchPattern)
+    }
+    
+    if (dateFrom && dateFrom.trim()) {
+      sql += ' AND reception_datetime >= ?'
+      bindings.push(dateFrom.trim())
+    }
+    
+    if (dateTo && dateTo.trim()) {
+      sql += ' AND reception_datetime <= ?'
+      bindings.push(dateTo.trim())
+    }
+    
+    sql += ' ORDER BY reception_datetime DESC LIMIT 100'
+    
+    let result
+    if (bindings.length > 0) {
+      result = await DB.prepare(sql).bind(...bindings).all()
+    } else {
+      result = await DB.prepare(sql).all()
+    }
+    
+    return c.json({ 
+      consultations: result.results || [],
+      total: result.results?.length || 0
+    })
+  } catch (error: any) {
+    console.error('検索エラー:', error)
+    return c.json({ 
+      consultations: [],
+      total: 0,
+      error: error.message || '検索エラーが発生しました'
+    }, 500)
+  }
+})
+
 // 相談記録一覧取得（ページネーション対応）
 app.get('/api/consultations', async (c) => {
   const { DB } = c.env
@@ -200,83 +277,6 @@ app.delete('/api/consultations/:id', async (c) => {
     return c.json({ 
       success: false, 
       message: 'エラーが発生しました: ' + error.message 
-    }, 500)
-  }
-})
-
-// 検索API
-app.get('/api/consultations/search', async (c) => {
-  try {
-    const { DB } = c.env
-    
-    if (!DB) {
-      return c.json({ 
-        consultations: [],
-        total: 0,
-        error: 'Database not available' 
-      }, 500)
-    }
-    
-    const callerName = c.req.query('caller_name') || ''
-    const addictionType = c.req.query('addiction_type') || ''
-    const urgencyLevel = c.req.query('urgency_level') || ''
-    const keyword = c.req.query('keyword') || ''
-    const dateFrom = c.req.query('date_from') || ''
-    const dateTo = c.req.query('date_to') || ''
-    
-    let sql = 'SELECT * FROM consultations WHERE 1=1'
-    const bindings: any[] = []
-    
-    if (callerName && callerName.trim()) {
-      sql += ' AND caller_name LIKE ?'
-      bindings.push(`%${callerName.trim()}%`)
-    }
-    
-    if (addictionType && addictionType.trim()) {
-      sql += ' AND addiction_types LIKE ?'
-      bindings.push(`%${addictionType.trim()}%`)
-    }
-    
-    if (urgencyLevel && urgencyLevel.trim()) {
-      sql += ' AND emergency_level = ?'
-      bindings.push(urgencyLevel.trim())
-    }
-    
-    if (keyword && keyword.trim()) {
-      sql += ' AND (caller_name LIKE ? OR consultation_content LIKE ? OR notes LIKE ?)'
-      const searchPattern = `%${keyword.trim()}%`
-      bindings.push(searchPattern, searchPattern, searchPattern)
-    }
-    
-    if (dateFrom && dateFrom.trim()) {
-      sql += ' AND reception_datetime >= ?'
-      bindings.push(dateFrom.trim())
-    }
-    
-    if (dateTo && dateTo.trim()) {
-      sql += ' AND reception_datetime <= ?'
-      bindings.push(dateTo.trim())
-    }
-    
-    sql += ' ORDER BY reception_datetime DESC LIMIT 100'
-    
-    let result
-    if (bindings.length > 0) {
-      result = await DB.prepare(sql).bind(...bindings).all()
-    } else {
-      result = await DB.prepare(sql).all()
-    }
-    
-    return c.json({ 
-      consultations: result.results || [],
-      total: result.results?.length || 0
-    })
-  } catch (error: any) {
-    console.error('検索エラー:', error)
-    return c.json({ 
-      consultations: [],
-      total: 0,
-      error: error.message || '検索エラーが発生しました'
     }, 500)
   }
 })

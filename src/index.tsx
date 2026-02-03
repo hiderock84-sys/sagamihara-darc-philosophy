@@ -207,23 +207,35 @@ app.delete('/api/consultations/:id', async (c) => {
 // 検索API
 app.get('/api/consultations/search', async (c) => {
   const { DB } = c.env
+  const callerName = c.req.query('caller_name') || ''
+  const addictionType = c.req.query('addiction_type') || ''
+  const urgencyLevel = c.req.query('urgency_level') || ''
   const keyword = c.req.query('keyword') || ''
-  const emergencyLevel = c.req.query('emergency_level') || ''
   const dateFrom = c.req.query('date_from') || ''
   const dateTo = c.req.query('date_to') || ''
   
   let sql = 'SELECT * FROM consultations WHERE 1=1'
   const bindings: any[] = []
   
+  if (callerName) {
+    sql += ' AND caller_name LIKE ?'
+    bindings.push(`%${callerName}%`)
+  }
+  
+  if (addictionType) {
+    sql += ' AND addiction_types LIKE ?'
+    bindings.push(`%${addictionType}%`)
+  }
+  
+  if (urgencyLevel) {
+    sql += ' AND emergency_level = ?'
+    bindings.push(urgencyLevel)
+  }
+  
   if (keyword) {
     sql += ' AND (caller_name LIKE ? OR consultation_content LIKE ? OR notes LIKE ?)'
     const searchPattern = `%${keyword}%`
     bindings.push(searchPattern, searchPattern, searchPattern)
-  }
-  
-  if (emergencyLevel) {
-    sql += ' AND emergency_level = ?'
-    bindings.push(emergencyLevel)
   }
   
   if (dateFrom) {
@@ -240,7 +252,10 @@ app.get('/api/consultations/search', async (c) => {
   
   const result = await DB.prepare(sql).bind(...bindings).all()
   
-  return c.json({ consultations: result.results })
+  return c.json({ 
+    consultations: result.results,
+    total: result.results.length 
+  })
 })
 
 // ==========================================

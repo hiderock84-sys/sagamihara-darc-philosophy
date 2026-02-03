@@ -32,13 +32,33 @@ const ADDICTION_TYPES = [
 
 // 相談フェーズの定義
 const PHASES = [
-  '初期対応',
-  '情報収集',
-  '状況確認',
-  '提案・説明',
-  '次のステップ',
-  '終了・フォローアップ'
+  '第1段階：初期対応（オープニング）',
+  '第2段階：情報収集（傾聴・共感）',
+  '第3段階：状況確認（アセスメント）',
+  '第4段階：提案・説明（情報提供）',
+  '第5段階：次のステップ（行動計画）',
+  '第6段階：終了・フォローアップ（クロージング）'
 ];
+
+// フェーズ名マッピング（UI表示名 → DB保存名）
+const PHASE_MAPPING = {
+  '第1段階：初期対応（オープニング）': '初期対応',
+  '第2段階：情報収集（傾聴・共感）': '情報収集',
+  '第3段階：状況確認（アセスメント）': '状況確認',
+  '第4段階：提案・説明（情報提供）': '提案・説明',
+  '第5段階：次のステップ（行動計画）': '次のステップ',
+  '第6段階：終了・フォローアップ（クロージング）': '終了・フォローアップ'
+};
+
+// DB保存名 → UI表示名の逆マッピング
+const PHASE_REVERSE_MAPPING = {
+  '初期対応': '第1段階：初期対応（オープニング）',
+  '情報収集': '第2段階：情報収集（傾聴・共感）',
+  '状況確認': '第3段階：状況確認（アセスメント）',
+  '提案・説明': '第4段階：提案・説明（情報提供）',
+  '次のステップ': '第5段階：次のステップ（行動計画）',
+  '終了・フォローアップ': '第6段階：終了・フォローアップ（クロージング）'
+};
 
 // ==========================================
 // PWA機能
@@ -564,12 +584,13 @@ function renderPhases() {
             <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #6b7280;">使用フレーズ</label>
             <select onchange="addPhraseToPhase('${phase}', this.value); this.value='';" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; background: white;">
               <option value="">よく使うフレーズを選択...</option>
-              ${Object.keys(phrasesByCategory).map(category => 
-                phrasesByCategory[category][phase] ? 
+              ${Object.keys(phrasesByCategory).map(category => {
+                const dbPhase = PHASE_MAPPING[phase] || phase;
+                return phrasesByCategory[category][dbPhase] ? 
                   `<optgroup label="${category}">
-                    ${phrasesByCategory[category][phase].map(p => `<option value="${p.id}">${p.phrase_text.substring(0, 50)}...</option>`).join('')}
-                  </optgroup>` : ''
-              ).join('')}
+                    ${phrasesByCategory[category][dbPhase].map(p => `<option value="${p.id}">${p.phrase_text.substring(0, 50)}...</option>`).join('')}
+                  </optgroup>` : '';
+              }).join('')}
             </select>
             <div id="phase_${index}_phrases" style="margin-top: 8px;"></div>
           </div>

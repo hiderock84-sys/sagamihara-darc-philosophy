@@ -1039,16 +1039,16 @@ function showConsultationForm(consultation = null) {
     };
   } else {
     currentConsultation = {
+      staff_name: staffList[0]?.name || '',
       caller_name: '',
       caller_phone: '',
+      caller_age: null,
+      caller_gender: '',
       caller_relationship: '',
-      target_name: '',
-      target_age: null,
-      target_gender: '',
       addiction_type: '',
       urgency_level: '中',
-      phases: {},
-      staff_id: staffList[0]?.id || null
+      notes: '',
+      phases: {}
     };
   }
   
@@ -1071,13 +1071,9 @@ function showConsultationForm(consultation = null) {
         
         <div style="margin-bottom: 16px;">
           <label style="display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: #374151;">対応スタッフ <span style="color: #ef4444;">*</span></label>
-          ${isEdit ? `
-            <input type="text" id="staff_name" value="${currentConsultation.staff_name}" onchange="updateConsultationField('staff_name', this.value)" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
-          ` : `
-            <select id="staff_id" onchange="updateConsultationField('staff_id', this.value)" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; background: white;">
-              ${staffList.map(staff => `<option value="${staff.id}" ${staff.id === currentConsultation.staff_id ? 'selected' : ''}>${staff.name}</option>`).join('')}
-            </select>
-          `}
+          <select id="staff_name" onchange="updateConsultationField('staff_name', this.value)" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px; background: white;">
+            ${staffList.map(staff => `<option value="${staff.name}" ${currentConsultation.staff_name === staff.name ? 'selected' : ''}>${staff.name}</option>`).join('')}
+          </select>
         </div>
         
         <div style="margin-bottom: 16px;">

@@ -60,6 +60,17 @@ const PHASE_REVERSE_MAPPING = {
   '終了・フォローアップ': '第6段階：終了・フォローアップ（クロージング）'
 };
 
+// カテゴリ名マッピング（DB保存名 → UI表示名）
+const CATEGORY_DISPLAY_NAMES = {
+  'opening': '第1段階：初期対応（オープニング）',
+  'listening': '第2段階：情報収集（傾聴・共感）',
+  'assessment': '第3段階：状況確認（アセスメント）',
+  'information': '第4段階：提案・説明（情報提供）',
+  'next_steps': '第5段階：次のステップ（行動計画）',
+  'closing': '第6段階：終了・フォローアップ（クロージング）',
+  'emergency': '緊急対応（クライシス）'
+};
+
 // ==========================================
 // PWA機能
 // ==========================================
@@ -1206,14 +1217,14 @@ async function showManual() {
         <div style="display: flex; flex-wrap: wrap; gap: 8px;">
           ${(() => {
             // カテゴリ表示順序を定義
-            const categoryOrder = ['opening', 'listening', 'information', 'closing', 'emergency'];
+            const categoryOrder = ['opening', 'listening', 'assessment', 'information', 'next_steps', 'closing', 'emergency'];
             const allCategories = Object.keys(phrasesByCategory);
             const sortedCategories = categoryOrder.filter(cat => allCategories.includes(cat))
               .concat(allCategories.filter(cat => !categoryOrder.includes(cat)));
             
             // カテゴリボタンを生成
             const categoryButtons = sortedCategories.map(category => `
-              <button onclick="filterManualByCategory('${category}')" style="padding: 8px 16px; background: white; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">${category}</button>
+              <button onclick="filterManualByCategory('${category}')" style="padding: 8px 16px; background: white; color: #3b82f6; border: 2px solid #3b82f6; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">${CATEGORY_DISPLAY_NAMES[category] || category}</button>
             `).join('');
             
             // 「すべて」ボタンを最後に追加
@@ -1237,13 +1248,15 @@ async function showManual() {
 function renderManualPhrases(category, searchTerm) {
   let html = '';
   
-  // カテゴリ表示順序を定義（opening → listening → information → emergency → closing）
+  // カテゴリ表示順序を定義（opening → listening → assessment → information → next_steps → closing → emergency）
   const categoryOrder = [
     'opening',      // 第1段階
     'listening',    // 第2段階
-    'information',  // 第3段階
-    'emergency',    // 緊急対応
-    'closing'       // 第4段階
+    'assessment',   // 第3段階
+    'information',  // 第4段階
+    'next_steps',   // 第5段階
+    'closing',      // 第6段階
+    'emergency'     // 緊急対応
   ];
   
   // カテゴリをソート（定義順 → 存在するカテゴリのみ表示）
@@ -1258,7 +1271,7 @@ function renderManualPhrases(category, searchTerm) {
     
     html += `
       <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-        <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #1f2937; border-bottom: 2px solid #f59e0b; padding-bottom: 8px;">${cat}</h3>
+        <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #1f2937; border-bottom: 2px solid #f59e0b; padding-bottom: 8px;">${CATEGORY_DISPLAY_NAMES[cat] || cat}</h3>
         
         ${Object.entries(phases).map(([phase, phrases]) => {
           const filteredPhrases = searchTerm 
@@ -1271,7 +1284,7 @@ function renderManualPhrases(category, searchTerm) {
             <div style="margin-bottom: 20px;">
               <h4 style="margin: 0 0 12px 0; font-size: 15px; font-weight: 700; color: #6b7280; display: flex; align-items: center;">
                 <span style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; margin-right: 8px;"></span>
-                ${phase}
+                ${PHASE_REVERSE_MAPPING[phase] || phase}
               </h4>
               
               ${filteredPhrases.map((phrase, index) => `

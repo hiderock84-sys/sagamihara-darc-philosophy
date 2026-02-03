@@ -704,13 +704,24 @@ async function showHistory() {
           </select>
         </div>
         
-        <div style="display: flex; gap: 8px;">
-          <select id="search_urgency" style="flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; background: white;">
-            <option value="">すべての緊急度</option>
-            <option value="高">高</option>
-            <option value="中">中</option>
-            <option value="低">低</option>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <select id="search_caller_age" style="flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; background: white;">
+            <option value="">本人年齢（全て）</option>
+            <option value="0-19">未成年（0〜19歳）</option>
+            <option value="20-29">20代（20〜29歳）</option>
+            <option value="30-49">30〜40代（30〜49歳）</option>
+            <option value="50-999">50歳以上</option>
           </select>
+          <select id="search_family_age" style="flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; background: white;">
+            <option value="">家族年齢（全て）</option>
+            <option value="0-19">未成年（0〜19歳）</option>
+            <option value="20-29">20代（20〜29歳）</option>
+            <option value="30-49">30〜40代（30〜49歳）</option>
+            <option value="50-999">50歳以上</option>
+          </select>
+        </div>
+        
+        <div style="display: flex; gap: 8px;">
           <button onclick="applyHistoryFilter()" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">検索</button>
           <button onclick="clearHistoryFilter()" style="padding: 10px 16px; background: #f3f4f6; color: #6b7280; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">クリア</button>
         </div>
@@ -789,12 +800,14 @@ async function loadHistoryPage(page) {
 async function applyHistoryFilter() {
   const name = document.getElementById('search_name').value;
   const addiction = document.getElementById('search_addiction').value;
-  const urgency = document.getElementById('search_urgency').value;
+  const callerAge = document.getElementById('search_caller_age').value;
+  const familyAge = document.getElementById('search_family_age').value;
   
   currentFilter = {};
   if (name) currentFilter.caller_name = name;
   if (addiction) currentFilter.addiction_type = addiction;
-  if (urgency) currentFilter.urgency_level = urgency;
+  if (callerAge) currentFilter.caller_age_range = callerAge;
+  if (familyAge) currentFilter.family_age_range = familyAge;
   
   const data = await searchConsultations(currentFilter);
   document.getElementById('consultations-list').innerHTML = renderConsultationsList(data.consultations);
@@ -803,10 +816,13 @@ async function applyHistoryFilter() {
 function clearHistoryFilter() {
   document.getElementById('search_name').value = '';
   document.getElementById('search_addiction').value = '';
-  document.getElementById('search_urgency').value = '';
+  document.getElementById('search_caller_age').value = '';
+  document.getElementById('search_family_age').value = '';
   currentFilter = {};
   showHistory();
 }
+
+let editingConsultation = null;
 
 async function showConsultationDetail(id) {
   try {
@@ -814,6 +830,7 @@ async function showConsultationDetail(id) {
     if (!response.ok) throw new Error('詳細取得失敗');
     const data = await response.json();
     const consultation = data.consultation || data;
+    editingConsultation = consultation;
     
     const date = new Date(consultation.created_at || consultation.reception_datetime);
     const dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
@@ -1267,7 +1284,7 @@ function filterManualByCategory(category) {
 
 function showError(message) {
   const toast = document.createElement('div');
-  toast.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; padding: 16px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999; max-width: 90%; animation: slideDown 0.3s ease;';
+  toast.style.cssText = 'position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; padding: 16px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999; max-width: 90%; animation: slideDown 0.3s ease;';
   toast.textContent = `❌ ${message}`;
   document.body.appendChild(toast);
   
@@ -1279,7 +1296,7 @@ function showError(message) {
 
 function showSuccess(message) {
   const toast = document.createElement('div');
-  toast.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 16px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999; max-width: 90%; animation: slideDown 0.3s ease;';
+  toast.style.cssText = 'position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 16px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999; max-width: 90%; animation: slideDown 0.3s ease;';
   toast.textContent = `✅ ${message}`;
   document.body.appendChild(toast);
   
@@ -1291,7 +1308,7 @@ function showSuccess(message) {
 
 function showInfo(message) {
   const toast = document.createElement('div');
-  toast.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #3b82f6; color: white; padding: 16px 24px; border-rounded: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999; max-width: 90%; animation: slideDown 0.3s ease;';
+  toast.style.cssText = 'position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #3b82f6; color: white; padding: 16px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999; max-width: 90%; animation: slideDown 0.3s ease;';
   toast.textContent = `ℹ️ ${message}`;
   document.body.appendChild(toast);
   
@@ -1390,10 +1407,11 @@ let touchEndY = 0;
 function handleSwipe() {
   const deltaX = touchEndX - touchStartX;
   const deltaY = touchEndY - touchStartY;
-  const minSwipeDistance = 50; // 最小スワイプ距離（px）
+  const minSwipeDistance = 100; // 最小スワイプ距離（50→100pxに変更で誤操作防止）
   
-  // 横スワイプの方が縦スワイプより大きい場合のみ処理
-  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+  // 横スワイプの方が縦スワイプより十分大きい場合のみ処理
+  // 横方向の移動が縦方向の2倍以上の場合のみ横スワイプとみなす
+  if (Math.abs(deltaX) > Math.abs(deltaY) * 2 && Math.abs(deltaX) > minSwipeDistance) {
     if (deltaX > 0) {
       // 右スワイプ = 戻る
       console.log('👉 右スワイプ検出: 戻る');

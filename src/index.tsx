@@ -111,6 +111,8 @@ app.get('/api/consultations/search', async (c) => {
     const callerName = c.req.query('caller_name') || ''
     const addictionType = c.req.query('addiction_type') || ''
     const urgencyLevel = c.req.query('urgency_level') || ''
+    const callerAgeRange = c.req.query('caller_age_range') || ''
+    const familyAgeRange = c.req.query('family_age_range') || ''
     const keyword = c.req.query('keyword') || ''
     const dateFrom = c.req.query('date_from') || ''
     const dateTo = c.req.query('date_to') || ''
@@ -131,6 +133,20 @@ app.get('/api/consultations/search', async (c) => {
     if (urgencyLevel && urgencyLevel.trim()) {
       sql += ' AND emergency_level = ?'
       bindings.push(urgencyLevel.trim())
+    }
+    
+    // 本人年齢範囲検索
+    if (callerAgeRange && callerAgeRange.trim()) {
+      const [min, max] = callerAgeRange.split('-').map(Number)
+      sql += ' AND caller_age >= ? AND caller_age <= ?'
+      bindings.push(min, max)
+    }
+    
+    // 家族年齢範囲検索（family_ageフィールドが存在する場合）
+    if (familyAgeRange && familyAgeRange.trim()) {
+      const [min, max] = familyAgeRange.split('-').map(Number)
+      sql += ' AND family_age >= ? AND family_age <= ?'
+      bindings.push(min, max)
     }
     
     if (keyword && keyword.trim()) {

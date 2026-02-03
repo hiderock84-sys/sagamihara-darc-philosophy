@@ -208,6 +208,15 @@ app.delete('/api/consultations/:id', async (c) => {
 app.get('/api/consultations/search', async (c) => {
   try {
     const { DB } = c.env
+    
+    if (!DB) {
+      return c.json({ 
+        consultations: [],
+        total: 0,
+        error: 'Database not available' 
+      }, 500)
+    }
+    
     const callerName = c.req.query('caller_name') || ''
     const addictionType = c.req.query('addiction_type') || ''
     const urgencyLevel = c.req.query('urgency_level') || ''
@@ -218,45 +227,45 @@ app.get('/api/consultations/search', async (c) => {
     let sql = 'SELECT * FROM consultations WHERE 1=1'
     const bindings: any[] = []
     
-    if (callerName) {
+    if (callerName && callerName.trim()) {
       sql += ' AND caller_name LIKE ?'
-      bindings.push(`%${callerName}%`)
+      bindings.push(`%${callerName.trim()}%`)
     }
     
-    if (addictionType) {
+    if (addictionType && addictionType.trim()) {
       sql += ' AND addiction_types LIKE ?'
-      bindings.push(`%${addictionType}%`)
+      bindings.push(`%${addictionType.trim()}%`)
     }
     
-    if (urgencyLevel) {
+    if (urgencyLevel && urgencyLevel.trim()) {
       sql += ' AND emergency_level = ?'
-      bindings.push(urgencyLevel)
+      bindings.push(urgencyLevel.trim())
     }
     
-    if (keyword) {
+    if (keyword && keyword.trim()) {
       sql += ' AND (caller_name LIKE ? OR consultation_content LIKE ? OR notes LIKE ?)'
-      const searchPattern = `%${keyword}%`
+      const searchPattern = `%${keyword.trim()}%`
       bindings.push(searchPattern, searchPattern, searchPattern)
     }
     
-    if (dateFrom) {
+    if (dateFrom && dateFrom.trim()) {
       sql += ' AND reception_datetime >= ?'
-      bindings.push(dateFrom)
+      bindings.push(dateFrom.trim())
     }
     
-    if (dateTo) {
+    if (dateTo && dateTo.trim()) {
       sql += ' AND reception_datetime <= ?'
-      bindings.push(dateTo)
+      bindings.push(dateTo.trim())
     }
     
     sql += ' ORDER BY reception_datetime DESC LIMIT 100'
     
-    console.log('検索SQL:', sql)
-    console.log('バインド値:', bindings)
-    
-    const result = await DB.prepare(sql).bind(...bindings).all()
-    
-    console.log('検索結果件数:', result.results?.length || 0)
+    let result
+    if (bindings.length > 0) {
+      result = await DB.prepare(sql).bind(...bindings).all()
+    } else {
+      result = await DB.prepare(sql).all()
+    }
     
     return c.json({ 
       consultations: result.results || [],
@@ -267,7 +276,7 @@ app.get('/api/consultations/search', async (c) => {
     return c.json({ 
       consultations: [],
       total: 0,
-      error: error.message 
+      error: error.message || '検索エラーが発生しました'
     }, 500)
   }
 })

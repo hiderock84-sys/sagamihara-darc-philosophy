@@ -1735,7 +1735,6 @@ document.addEventListener('touchend', (e) => {
   touchEndY = e.changedTouches[0].screenY;
   handleSwipe();
 }, { passive: true });
-}, { passive: true });
 
 // ==========================================
 // プルダウン更新機能 (Pull to Refresh)

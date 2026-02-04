@@ -1697,11 +1697,20 @@ let touchEndY = 0;
 function handleSwipe() {
   const deltaX = touchEndX - touchStartX;
   const deltaY = touchEndY - touchStartY;
-  const minSwipeDistance = 100; // 最小スワイプ距離（50→100pxに変更で誤操作防止）
+  const minSwipeDistance = 120; // 120pxに増加（より確実なスワイプ判定）
+  const swipeVelocityThreshold = 0.5; // 速度の閾値（px/ms）
   
-  // 横スワイプの方が縦スワイプより十分大きい場合のみ処理
-  // 横方向の移動が縦方向の2倍以上の場合のみ横スワイプとみなす
-  if (Math.abs(deltaX) > Math.abs(deltaY) * 2 && Math.abs(deltaX) > minSwipeDistance) {
+  // スワイプ時間を計算
+  const swipeTime = Date.now() - (window.swipeStartTime || Date.now());
+  const swipeVelocity = Math.abs(deltaX) / swipeTime;
+  
+  // 横方向のスワイプが縦方向の2.5倍以上、かつ
+  // 十分な距離または速度がある場合のみ判定
+  const isHorizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY) * 2.5;
+  const isLongEnough = Math.abs(deltaX) > minSwipeDistance;
+  const isFastEnough = swipeVelocity > swipeVelocityThreshold;
+  
+  if (isHorizontalSwipe && (isLongEnough || isFastEnough)) {
     if (deltaX > 0) {
       // 右スワイプ = 戻る
       console.log('👉 右スワイプ検出: 戻る');
@@ -1718,12 +1727,14 @@ function handleSwipe() {
 document.addEventListener('touchstart', (e) => {
   touchStartX = e.changedTouches[0].screenX;
   touchStartY = e.changedTouches[0].screenY;
+  window.swipeStartTime = Date.now(); // スワイプ開始時刻を記録
 }, { passive: true });
 
 document.addEventListener('touchend', (e) => {
   touchEndX = e.changedTouches[0].screenX;
   touchEndY = e.changedTouches[0].screenY;
   handleSwipe();
+}, { passive: true });
 }, { passive: true });
 
 // ==========================================
@@ -1735,27 +1746,27 @@ let pullCurrentY = 0;
 let isPulling = false;
 let refreshIndicator = null;
 
-// 更新インジケーターを作成
+// 更新インジケーターを作成（iPhone小窓に被らないように配置）
 function createRefreshIndicator() {
   if (!refreshIndicator) {
     refreshIndicator = document.createElement('div');
     refreshIndicator.id = 'refresh-indicator';
     refreshIndicator.style.cssText = `
       position: fixed;
-      top: -60px;
+      top: -80px;
       left: 50%;
       transform: translateX(-50%);
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       background: linear-gradient(135deg, #3b82f6, #2563eb);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 24px;
       z-index: 9999;
       transition: top 0.3s ease;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
     `;
     refreshIndicator.innerHTML = '🔄';
     document.body.appendChild(refreshIndicator);
@@ -1763,10 +1774,10 @@ function createRefreshIndicator() {
   return refreshIndicator;
 }
 
-// プルダウン更新処理
+// プルダウン更新処理（iPhone小窓を避けて表示）
 async function handlePullToRefresh() {
   const indicator = createRefreshIndicator();
-  indicator.style.top = '20px';
+  indicator.style.top = '100px';  // iPhone小窓を避けて下に配置
   indicator.style.animation = 'spin 1s linear infinite';
   
   // CSSアニメーションを追加
@@ -1789,9 +1800,9 @@ async function handlePullToRefresh() {
   
   // 少し待ってからインジケーターを非表示
   setTimeout(() => {
-    indicator.style.top = '-60px';
+    indicator.style.top = '-80px';
     indicator.style.animation = '';
-  }, 1000);
+  }, 1500);  // 表示時間を少し長く
 }
 
 // プルダウン用のタッチイベント
@@ -1809,10 +1820,11 @@ document.addEventListener('touchmove', (e) => {
   pullCurrentY = e.touches[0].clientY;
   const pullDistance = pullCurrentY - pullStartY;
   
-  // 下方向に50px以上引っ張った場合
-  if (pullDistance > 50 && window.scrollY === 0) {
+  // 下方向に60px以上引っ張った場合（反応しやすく）
+  if (pullDistance > 60 && window.scrollY === 0) {
     const indicator = createRefreshIndicator();
-    const displayDistance = Math.min(pullDistance - 50, 40);
+    // iPhone小窓を避けて表示位置を調整
+    const displayDistance = Math.min(pullDistance - 60, 60) + 80;
     indicator.style.top = `${displayDistance}px`;
   }
 }, { passive: true });
@@ -1822,13 +1834,13 @@ document.addEventListener('touchend', (e) => {
   
   const pullDistance = pullCurrentY - pullStartY;
   
-  // 80px以上引っ張った場合は更新実行
-  if (pullDistance > 80 && window.scrollY === 0) {
+  // 100px以上引っ張った場合は更新実行（しっかり引かないと実行されない）
+  if (pullDistance > 100 && window.scrollY === 0) {
     handlePullToRefresh();
   } else {
     // 更新しない場合はインジケーターを戻す
     const indicator = createRefreshIndicator();
-    indicator.style.top = '-60px';
+    indicator.style.top = '-80px';
   }
   
   isPulling = false;
